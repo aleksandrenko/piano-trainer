@@ -4,101 +4,128 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Пиано учител</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0f1220; --panel:#181c30; --panel-2:#222843; --ink:#eceefa; --muted:#9097bd; --border:#2e3558;
-  --accent:#5b8cff; --good:#34d17c; --bad:#ff5d6c; --warn:#ffbf4d;
+  --bg:#13111e; --bg-2:#1d1830; --panel:rgba(255,255,255,.045); --panel-2:rgba(255,255,255,.07); --panel-solid:#1f1a33;
+  --ink:#f1eefb; --muted:#a39dc2; --border:rgba(255,255,255,.09); --border-2:rgba(255,255,255,.16);
+  --accent:#6d8bff; --accent-2:#9b7bff; --good:#3ddc8a; --bad:#ff6474; --warn:#ffc15e; --gold:#f7c96b;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --font:"Nunito",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html,body{margin:0;min-height:100%;color:var(--ink);font:15px/1.45 var(--font)}
+body{background:radial-gradient(1200px 600px at 15% -10%,#2f2553 0%,transparent 60%),radial-gradient(900px 500px at 100% 0%,#1e2a55 0%,transparent 55%),var(--bg);background-attachment:fixed}
 [hidden]{display:none!important}
-button{font:inherit;color:inherit;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;cursor:pointer}
-button:hover{border-color:#4a5596}
+button{font:inherit;font-weight:700;color:inherit;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:9px 16px;cursor:pointer;transition:background .15s,border-color .15s,transform .08s,box-shadow .15s}
+button:hover{background:rgba(255,255,255,.11);border-color:var(--border-2)}
+button:active{transform:translateY(1px)}
 button:disabled{opacity:.4;cursor:not-allowed}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-button.on{background:#2a3a73;border-color:var(--accent)}
-.app{max-width:1280px;margin:0 auto;padding:12px 16px 28px;display:flex;flex-direction:column;gap:12px}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
-.brand{font-weight:700;font-size:18px;margin-right:auto}
-.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.seg button{border:0;border-radius:0;background:var(--panel);padding:7px 12px}
-.seg button+button{border-left:1px solid var(--border)}
-.seg button.on{background:var(--accent);color:#fff}
-.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
-label{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+button.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent;color:#fff;box-shadow:0 6px 18px rgba(109,139,255,.35)}
+button.primary:hover{box-shadow:0 8px 24px rgba(109,139,255,.5);background:linear-gradient(135deg,#7d98ff,#aa8cff)}
+button.on{background:rgba(109,139,255,.18);border-color:rgba(109,139,255,.6)}
+.app{margin:0 auto;padding:16px 20px 28px;display:flex;flex-direction:column;gap:14px}
+.stage.fall{background:#120f22}
+.stage.fall #staff{height:420px}
+.focusbar{display:none;position:fixed;top:14px;right:14px;z-index:6;gap:6px;padding:6px;border-radius:16px;background:rgba(19,17,30,.72);backdrop-filter:blur(10px);border:1px solid var(--border-2);box-shadow:var(--shadow)}
+.focusbar button{padding:7px 12px}
+body.focus .focusbar{display:flex}
+body.focus .app{height:100vh;height:100dvh;padding:10px 12px 10px;gap:0}
+body.focus header,body.focus .panel,body.focus .prompt,body.focus .transport,body.focus .hint{display:none!important}
+body.focus .stage{flex:1 1 auto;min-height:0;border-radius:16px 16px 0 0}
+body.focus #staff{height:100%!important}
+body.focus #kb{height:max(150px,22vh)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:21px;margin-right:auto;letter-spacing:.2px}
+.brand svg{width:34px;height:34px;filter:drop-shadow(0 4px 10px rgba(109,139,255,.4))}
+.brand small{display:block;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
+.seg{display:inline-flex;gap:2px;padding:3px;background:var(--panel);border:1px solid var(--border);border-radius:14px}
+.seg button{border:0;border-radius:10px;background:transparent;padding:7px 13px;color:var(--muted)}
+.seg button:hover{background:rgba(255,255,255,.06);color:var(--ink)}
+.seg button.on{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 4px 12px rgba(109,139,255,.35)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:12px 16px;backdrop-filter:blur(8px)}
+label{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:14px;font-weight:600}
 label b{color:var(--ink);min-width:2.2em}
 input[type=range]{accent-color:var(--accent);width:120px}
-input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
-.songbtn{display:flex;flex-direction:column;align-items:flex-start;min-width:230px;text-align:left;padding:6px 14px}
-.songbtn span{font-weight:600}
-.songbtn small{color:var(--muted);font-size:12px}
-.meter{width:110px;height:8px;background:#0b0e1a;border-radius:4px;overflow:hidden;position:relative}
-.meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--good),var(--warn) 70%,var(--bad))}
-#heard{min-width:8em;font-weight:600;color:var(--ink)}
+input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px;margin:0}
+.songbtn{display:flex;align-items:center;gap:10px;min-width:240px;text-align:left;padding:8px 16px 8px 10px;border-radius:14px}
+.songbtn .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(247,201,107,.25),rgba(155,123,255,.25));font-size:17px}
+.songbtn span{display:block;font-weight:800}
+.songbtn small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.meter{width:110px;height:8px;background:rgba(0,0,0,.35);border-radius:4px;overflow:hidden;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--good),var(--warn) 70%,var(--bad));border-radius:4px}
+#heard{min-width:8em;font-weight:800;color:var(--ink)}
 #inStatus{color:var(--muted);font-size:14px}
 #diag{color:var(--muted);font-size:13px}
-.calbar{height:6px;background:#0b0e1a;border-radius:3px;overflow:hidden;margin:10px 0}
-.calbar i{display:block;height:100%;background:var(--accent)}
-.mini{--kw:42px;--bw:26px;position:relative;display:flex;width:max-content;margin:14px auto 4px}
-.mini .w{width:var(--kw);height:124px;background:#f7f7fb;border:1px solid #b9bdd6;border-radius:0 0 8px 8px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;padding-bottom:8px;color:#1d1f2b;font-weight:700;font-size:13px}
-.mini .w .n{width:22px;height:22px;border-radius:50%;background:#e1e4f3;display:flex;align-items:center;justify-content:center;font-size:12px}
-.mini .w.cur{background:#9dbaff;animation:pulse 1s ease-in-out infinite alternate}
+/* setup keyboard: same ivory-and-ebony look as the big one */
+.mini{--kw:42px;--bw:26px;position:relative;display:flex;width:max-content;margin:16px auto 6px;padding-top:9px;border-radius:6px 6px 8px 8px;background:linear-gradient(#5a5a5f,#2c2c30 6px,#a3231d 6px,#a3231d 9px,#1a1a1c 9px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
+.mini .w{width:var(--kw);height:128px;background:linear-gradient(#fffef7,#f3eed9);border-left:1px solid #a29c88;border-radius:0 0 5px 5px;box-shadow:inset 0 -6px 0 #e6dfc6,inset 0 8px 8px -6px rgba(0,0,0,.25);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;padding-bottom:12px;color:#4a4637;font-weight:800;font-size:13px}
+.mini .w:first-child{border-left:0}
+.mini .w .n{width:22px;height:22px;border-radius:50%;background:#e9e3cc;color:#4a4637;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mini .w.cur{background:linear-gradient(#e3eaff,#aec3ff);animation:pulse 1s ease-in-out infinite alternate}
 .mini .w.cur .n{background:var(--accent);color:#fff}
-.mini .w.done{background:#c8f3da}
+.mini .w.done{background:linear-gradient(#e6fbef,#9be8bd)}
 .mini .w.done .n{background:var(--good);color:#fff}
-.mini .b{position:absolute;top:0;width:var(--bw);height:74px;background:#15182a;border-radius:0 0 5px 5px}
+.mini .b{position:absolute;top:9px;width:var(--bw);height:76px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,#141416,#3a3a3f 45%,#141416);box-shadow:3px 3px 6px rgba(0,0,0,.45),inset 0 -12px 0 -2px #2b2b2f,inset 0 -13px 0 -2px #55555b}
 .mini-hint{font-size:13px;color:var(--muted);margin:2px 0 0}
-.mini .w.hb{background:#ffb3bb;animation:none}
-.mini .w.hg{background:#8ee8b3;animation:none}
-.mini .b.hb{background:#ff5d6c}
-.mini .b.hg{background:#34d17c}
-@keyframes pulse{from{background:#9dbaff}to{background:#c3d4ff}}
+.mini .w.hb{background:linear-gradient(#ffe3e6,#ff9aa4);animation:none}
+.mini .w.hg{background:linear-gradient(#dcf8e8,#7fe0a8);animation:none}
+.mini .b.hb{background:linear-gradient(90deg,#a82533,#ff6b78 45%,#a82533)}
+.mini .b.hg{background:linear-gradient(90deg,#127a3f,#3fcf7f 45%,#127a3f)}
+@keyframes pulse{from{filter:brightness(1)}to{filter:brightness(1.12)}}
 @media (max-width:440px){.mini{--kw:34px;--bw:21px}}
-.card .ok{color:var(--good);font-weight:600}
-.card .no{color:var(--warn);font-weight:600}
-.prompt{font-size:22px;font-weight:700;min-height:34px;text-align:center}
-.prompt .dim{color:var(--muted);font-weight:500;font-size:16px}
-.stage{position:relative;border-radius:14px;overflow:hidden;background:#fbf8f1;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.card .ok{color:var(--good);font-weight:800}
+.card .no{color:var(--warn);font-weight:800}
+.prompt{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px;min-height:42px;font-size:20px;font-weight:800}
+.prompt .dim{color:var(--muted);font-weight:600;font-size:15px}
+.prompt .nchip{display:inline-flex;align-items:center;padding:4px 14px;border-radius:999px;font-size:22px;background:linear-gradient(135deg,rgba(109,139,255,.28),rgba(155,123,255,.28));border:1px solid rgba(109,139,255,.55);box-shadow:0 4px 14px rgba(109,139,255,.25)}
+.prompt .hand{color:var(--muted);font-size:13px;font-weight:700;margin-right:-2px}
+.stage{position:relative;border-radius:20px;overflow:hidden;background:#fbf8f1;box-shadow:0 18px 40px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06)}
 #staff{display:block;width:100%;height:290px}
-.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,18,32,.5);backdrop-filter:blur(2px)}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px 24px;max-width:460px;text-align:center}
-.card h2{margin:0 0 4px;font-size:22px}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(19,17,30,.45);backdrop-filter:blur(3px)}
+.card{background:linear-gradient(180deg,#261f41,#1b1730);border:1px solid var(--border-2);border-radius:22px;padding:22px 26px;max-width:460px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.card h2{margin:0 0 4px;font-size:23px;font-weight:800}
 .card p{margin:6px 0;color:var(--muted)}
-.card .big{font-size:40px;font-weight:800;color:var(--ink);margin:6px 0}
-.card .stars{font-size:28px;color:var(--warn);letter-spacing:4px}
-.card .btns{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.card .big{font-size:46px;font-weight:800;color:var(--ink);margin:6px 0;background:linear-gradient(135deg,#fff,#c9b8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card .stars{font-size:30px;color:var(--gold);letter-spacing:5px;text-shadow:0 0 18px rgba(247,201,107,.45)}
+.card .btns{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 .transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.stats{display:flex;gap:14px;flex-wrap:wrap;margin-left:auto;color:var(--muted);font-size:14px}
-.stats b{color:var(--ink)}
-#kb{display:block;width:100%;height:150px;border-radius:10px}
+#btnPlay{min-width:118px;font-size:16px}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.stats span{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--border);color:var(--muted);font-size:13px;font-weight:700}
+.stats b{color:var(--ink);font-size:15px}
+.stats .s-good b{color:var(--good)} .stats .s-bad b{color:var(--bad)} .stats .s-streak b{color:var(--gold)}
+#kb{display:block;width:100%;height:176px;border-radius:10px 10px 12px 12px;filter:drop-shadow(0 16px 26px rgba(0,0,0,.5))}
 .hint{color:var(--muted);font-size:13px;margin:0;text-align:center}
-.hint kbd{background:var(--panel-2);border:1px solid var(--border);border-radius:5px;padding:0 5px;font:inherit;font-size:12px;color:var(--ink)}
+.hint kbd{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:1px 6px;font:inherit;font-size:12px;font-weight:700;color:var(--ink)}
 /* library */
-.lib{position:fixed;inset:0;background:rgba(8,10,20,.8);display:flex;justify-content:center;align-items:flex-start;padding:24px 16px;overflow:auto;z-index:10}
+.lib{position:fixed;inset:0;background:rgba(10,8,18,.75);backdrop-filter:blur(6px);display:flex;justify-content:center;align-items:flex-start;padding:24px 16px;overflow:auto;z-index:10}
 .lib.cal{align-items:center}
 .lib.cal .card{max-width:520px;width:100%}
-.lib-inner{background:var(--panel);border:1px solid var(--border);border-radius:18px;max-width:980px;width:100%;padding:18px 20px 22px}
+.lib-inner{background:linear-gradient(180deg,#241e3d,#1a1630);border:1px solid var(--border-2);border-radius:24px;max-width:980px;width:100%;padding:20px 22px 24px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
 .lib-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
-.lib-head h2{margin:0;margin-right:auto;font-size:20px}
-.lib h3{margin:18px 0 8px;font-size:15px;color:var(--muted);font-weight:600;display:flex;gap:10px;align-items:baseline}
-.lib h3 .lvl{color:var(--warn);letter-spacing:2px}
+.lib-head h2{margin:0;margin-right:auto;font-size:22px;font-weight:800}
+.lib h3{margin:22px 0 10px;font-size:15px;color:var(--ink);font-weight:800;display:flex;gap:10px;align-items:baseline}
+.lib h3 .lvl{color:var(--gold);letter-spacing:2px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
-.song{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border);cursor:pointer}
-.song:hover{border-color:#4a5596}
-.song .stars{color:var(--warn);font-size:12px;letter-spacing:1px}
-.song .del{position:absolute;top:6px;right:8px;color:var(--muted);padding:2px 6px;border-radius:6px}
-.song .del:hover{color:var(--bad);background:#2a1d2a}
-.imp{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;margin:8px 0 4px;background:var(--panel-2);border-radius:12px}
-.imp input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 8px;width:150px}
+.song{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:13px 15px;border-radius:16px;background:var(--panel-2);border:1px solid var(--border);cursor:pointer;transition:transform .12s,border-color .12s,background .12s}
+.song:hover{transform:translateY(-2px);border-color:rgba(109,139,255,.5);background:rgba(255,255,255,.09)}
+.song .stars{color:var(--gold);font-size:12px;letter-spacing:1px}
+.song .del{position:absolute;top:8px;right:10px;color:var(--muted);padding:2px 6px;border-radius:6px}
+.song .del:hover{color:var(--bad);background:rgba(255,100,116,.12)}
+.imp{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 14px;margin:10px 0 4px;background:var(--panel);border:1px solid var(--border);border-radius:16px}
+.imp input[type=text]{font:inherit;font-weight:700;color:var(--ink);background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:6px 10px;width:150px}
 #impMsg{font-size:13px;color:var(--muted)}
-.song.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-.song b{font-size:15px}
+.song.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset,0 6px 18px rgba(109,139,255,.25)}
+.song b{font-size:15px;font-weight:800}
 .song small{color:var(--muted);font-size:12px}
-.song .best{color:var(--good);font-size:12px;font-weight:600}
+.song .best{color:var(--good);font-size:12px;font-weight:800}
 @media (max-width:700px){
   #staff{height:270px}
-  #kb{height:110px}
+  #kb{height:124px}
   .brand{width:100%}
   .stats{margin-left:0}
 }
@@ -107,10 +134,18 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
 <body>
 <div class="app">
   <header>
-    <div class="brand">🎹 Пиано учител</div>
-    <button id="btnLib" class="songbtn"><span id="songTitle">—</span><small id="songMeta">Избери песен</small></button>
+    <div class="brand">
+      <svg viewBox="0 0 34 34" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6d8bff"/><stop offset="1" stop-color="#9b7bff"/></linearGradient></defs>
+        <rect width="34" height="34" rx="9" fill="url(#lg)"/><rect x="6" y="8" width="22" height="18" rx="3" fill="#fffef7"/>
+        <path d="M13.3 8v18M20.6 8v18" stroke="#b8b29c" stroke-width="1"/><rect x="11" y="8" width="4" height="10" rx="1" fill="#1b1b1e"/><rect x="18.4" y="8" width="4" height="10" rx="1" fill="#1b1b1e"/></svg>
+      <div>Пиано учител<small>свири, а аз слушам</small></div>
+    </div>
+    <button id="btnLib" class="songbtn"><span class="ico">📚</span><div><span id="songTitle">—</span><small id="songMeta">Избери песен</small></div></button>
     <div class="seg" id="hands" title="Коя ръка упражняваш">
       <button data-v="R">Дясна</button><button data-v="L">Лява</button><button data-v="both">Двете</button>
+    </div>
+    <div class="seg" id="view" title="Как да изглеждат нотите">
+      <button data-v="staff">🎼 Ноти</button><button data-v="fall">🌧 Водопад</button>
     </div>
     <div class="seg" id="mode" title="Как тече песента">
       <button data-v="wait">Изчаква ме</button><button data-v="realtime">В темп</button>
@@ -148,17 +183,24 @@ input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
     <button id="btnPlay" class="primary">▶ Старт</button>
     <button id="btnRestart">↺ Отначало</button>
     <button id="btnDemo">👂 Чуй как звучи</button>
+    <button id="btnFocus" title="Само нотите и клавиатурата, на цял екран">⛶ Фокус</button>
     <div class="stats">
-      <span>Точни <b id="stHit">0</b></span>
-      <span>Грешни <b id="stWrong">0</b></span>
-      <span>Пропуснати <b id="stMiss">0</b></span>
-      <span>Серия <b id="stStreak">0</b></span>
-      <span>Точност <b id="stAcc">—</b></span>
+      <span class="s-good">✓ <b id="stHit">0</b> точни</span>
+      <span class="s-bad">✗ <b id="stWrong">0</b> грешни</span>
+      <span>⏱ <b id="stMiss">0</b> пропуснати</span>
+      <span class="s-streak">🔥 <b id="stStreak">0</b> серия</span>
+      <span>🎯 <b id="stAcc">—</b></span>
     </div>
   </div>
 
   <canvas id="kb"></canvas>
   <p class="hint">Синият клавиш е нотата, която трябва да изсвириш · <kbd>Интервал</kbd> старт/пауза</p>
+</div>
+
+<div class="focusbar" id="focusbar">
+  <button id="fPlay" class="primary">▶ Старт</button>
+  <button id="fView">🌧 Водопад</button>
+  <button id="fExit" title="Изход от фокус (Esc)">✕</button>
 </div>
 
 <div class="lib cal" id="calModal" hidden></div>
@@ -739,7 +781,7 @@ const S = {
   song: null, notes: [], endBeat: 0, beat: 0, bpm: 90,
   hands: 'R', mode: 'wait', playing: false, demo: false, finished: false, waiting: false,
   stats: { hit: 0, miss: 0, wrong: 0, offsets: [] }, streak: 0,
-  feedback: [], ghosts: [], flash: new Map(), accompRecent: [],
+  feedback: [], ghosts: [], ripples: [], flash: new Map(), accompRecent: [], view: 'staff', focus: false,
   kbLo: 48, kbHi: 84, lastTs: 0,
 };
 const HIT_WIN = 0.2; // seconds either side in "В темп"
@@ -795,7 +837,7 @@ function reset() {
   S.playing = false; S.demo = false; S.finished = false; S.waiting = false;
   for (const n of S.notes) n.state = 'pending';
   S.stats = { hit: 0, miss: 0, wrong: 0, offsets: [] }; S.streak = 0;
-  S.feedback = []; S.ghosts = [];
+  S.feedback = []; S.ghosts = []; S.ripples = [];
   S.beat = startBeat();
   updateStats(); updateButtons(); showOverlay('start'); updatePrompt();
 }
@@ -899,7 +941,7 @@ function tryHit(midi, tEvent) {
     }
   }
   if (cand) {
-    cand.state = 'hit'; S.stats.hit++; S.streak++;
+    cand.state = 'hit'; S.stats.hit++; S.streak++; S.ripples.push({ n: cand, t: now });
     if (lenient) for (const n of S.notes) // hands in octaves: the mic cannot tell them apart
       if (n !== cand && n.state === 'pending' && isActive(n) && Math.abs(n.beat - cand.beat) < 1e-6 && (n.midi - midi) % 12 === 0) { n.state = 'hit'; S.stats.hit++; }
     S.flash.set(midi, { kind: 'good', until: now + 700 });
@@ -928,7 +970,7 @@ function wrongNote(midi) {
 window.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.code === 'Space') { e.preventDefault(); if (!$('#lib').hidden || calib.c) return; togglePlay(); }
-  else if (e.code === 'Escape') $('#lib').hidden = true;
+  else if (e.code === 'Escape') { if (!$('#lib').hidden) $('#lib').hidden = true; else if (S.focus) setFocus(false); }
 });
 
 const mic = { active: false, stream: null, analyser: null, buf: null, det: null, heard: [] };
@@ -1064,12 +1106,15 @@ const cv = $('#staff'), g = cv.getContext('2d');
 const kb = $('#kb'), gk = kb.getContext('2d');
 const L = 12, H = 6, T_TOP = 64, T_BOT = T_TOP + 4 * L, B_TOP = T_BOT + 5 * L, B_BOT = B_TOP + 4 * L;
 const INK = { paper: '#fbf8f1', ink: '#1d1f2b', line: '#77757f', next: '#2f6bff', hit: '#17a34a', miss: '#dc3545', off: '#c4beb1', played: '#5a6b8c' };
-let W = 800, CH = 290, PX = 200, PPB = 90, PANEL = 110;
+const STAFF_H = 290;
+let W = 800, CH = 290, PX = 200, PPB = 90, PANEL = 110, SC = 1;
 
 function resize() {
-  const dpr = window.devicePixelRatio || 1;
-  W = cv.clientWidth; CH = cv.clientHeight;
-  cv.width = Math.round(W * dpr); cv.height = Math.round(CH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const dpr = window.devicePixelRatio || 1, cw = cv.clientWidth, ch = cv.clientHeight;
+  // the staff is drawn at a fixed height; when there is more room (focus mode) it is scaled up
+  SC = S.view === 'staff' ? Math.max(1, Math.min(ch / STAFF_H, cw / 700, 2.4)) : 1;
+  W = cw / SC; CH = ch / SC;
+  cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); g.setTransform(dpr * SC, 0, 0, dpr * SC, 0, 0);
   kb.width = Math.round(kb.clientWidth * dpr); kb.height = Math.round(kb.clientHeight * dpr); gk.setTransform(dpr, 0, 0, dpr, 0, 0);
   const ks = S.song && S.song.key ? S.song.key.length : 0;
   PANEL = 76 + ks * 11 + (ks ? 6 : 0) + 30;
@@ -1124,7 +1169,7 @@ function drawNote(n, x, color) {
   }
   if ($('#optNames').checked) {
     g.fillStyle = color; g.font = '600 12px -apple-system,system-ui,sans-serif'; g.textAlign = 'center';
-    g.fillText(noteName(n), x, staff === 'T' ? 18 : CH - 8);
+    g.fillText(noteName(n), x, staff === 'T' ? 18 : STAFF_H - 8);
   }
 }
 function staffLines(x0, x1) {
@@ -1135,8 +1180,12 @@ function staffLines(x0, x1) {
 }
 function drawStaff() {
   const now = performance.now(), song = S.song;
-  g.fillStyle = INK.paper; g.fillRect(0, 0, W, CH);
+  const paper = g.createLinearGradient(0, 0, 0, CH);
+  paper.addColorStop(0, '#fdfaf3'); paper.addColorStop(1, '#f5efe0');
+  g.fillStyle = paper; g.fillRect(0, 0, W, CH);
   if (!song) return;
+  const yOff = Math.max(0, (CH - STAFF_H) / 2); // keep the grand staff centred when there is extra height
+  g.save(); g.translate(0, yOff);
 
   // hit window (В темп) / waiting glow (Изчаква ме)
   if (S.mode === 'realtime' && !S.demo) {
@@ -1159,10 +1208,13 @@ function drawStaff() {
     if (final) { g.lineWidth = 4; g.beginPath(); g.moveTo(x + 5, T_TOP); g.lineTo(x + 5, B_BOT); g.stroke(); }
   }
 
-  // playhead
+  // playhead, with a soft glow
   const pulse = S.waiting ? 0.55 + 0.45 * Math.sin(now / 160) : 0.9;
-  g.strokeStyle = `rgba(47,107,255,${pulse})`; g.lineWidth = 3;
-  g.beginPath(); g.moveTo(PX, T_TOP - 26); g.lineTo(PX, B_BOT + 26); g.stroke();
+  const glow = g.createLinearGradient(PX - 22, 0, PX + 22, 0);
+  glow.addColorStop(0, 'rgba(109,139,255,0)'); glow.addColorStop(0.5, `rgba(109,139,255,${0.16 * pulse})`); glow.addColorStop(1, 'rgba(109,139,255,0)');
+  g.fillStyle = glow; g.fillRect(PX - 22, T_TOP - 30, 44, B_BOT - T_TOP + 60);
+  g.strokeStyle = `rgba(79,109,245,${pulse})`; g.lineWidth = 2.5; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(PX, T_TOP - 26); g.lineTo(PX, B_BOT + 26); g.stroke(); g.lineCap = 'butt';
 
   // notes
   const targets = new Set(currentTargets());
@@ -1186,6 +1238,13 @@ function drawStaff() {
     drawHead(PX, yOf(info.diat, staff), false, INK.miss);
     g.globalAlpha = 1;
   }
+  // a ring bursts out of every note played right
+  S.ripples = S.ripples.filter(r => now - r.t < 500);
+  for (const r of S.ripples) {
+    const a = (now - r.t) / 500;
+    g.strokeStyle = `rgba(23,163,74,${1 - a})`; g.lineWidth = 2.5 * (1 - a) + 0.5;
+    g.beginPath(); g.arc(PX, yOf(r.n.diat, staffOf(r.n)), 8 + a * 22, 0, Math.PI * 2); g.stroke();
+  }
   // floating feedback between the staves
   S.feedback = S.feedback.filter(f => now - f.t < 800);
   g.textAlign = 'right'; g.font = '700 15px -apple-system,system-ui,sans-serif';
@@ -1199,8 +1258,8 @@ function drawStaff() {
   // left panel: clefs, key and time signature (notes fade under it)
   const grad = g.createLinearGradient(PANEL, 0, PANEL + 30, 0);
   grad.addColorStop(0, INK.paper); grad.addColorStop(1, 'rgba(251,248,241,0)');
-  g.fillStyle = INK.paper; g.fillRect(0, 0, PANEL, CH);
-  g.fillStyle = grad; g.fillRect(PANEL, 0, 30, CH);
+  g.fillStyle = INK.paper; g.fillRect(0, -yOff, PANEL, CH);
+  g.fillStyle = grad; g.fillRect(PANEL, -yOff, 30, CH);
   staffLines(8, PANEL + 30);
   g.strokeStyle = INK.ink; g.lineWidth = 2;
   g.beginPath(); g.moveTo(8, T_TOP); g.lineTo(8, B_BOT + 1); g.stroke();
@@ -1221,53 +1280,175 @@ function drawStaff() {
   const tx = 68 + key.length * 11 + (key.length ? 6 : 0);
   g.font = '700 25px Georgia,serif'; g.textAlign = 'center';
   for (const top of [T_TOP, B_TOP]) { g.fillText(tsTop, tx, top + 2 * L - 2); g.fillText(tsBot, tx, top + 4 * L - 2); }
+  g.restore();
+}
+
+/* ============================================================
+   Drawing: waterfall — notes fall onto the key they belong to
+   ============================================================ */
+const FALL = {
+  R: ['#9fb3ff', '#5d72f2'], L: ['#ffc98a', '#ff8d4d'],
+  hit: ['#7ff0b3', '#22b168'], miss: ['#ff9aa3', '#e0404f'],
+};
+function drawFall() {
+  const w = cv.clientWidth, h = cv.clientHeight, now = performance.now(), song = S.song;
+  const bg = g.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, '#120f22'); bg.addColorStop(1, '#1d1838');
+  g.fillStyle = bg; g.fillRect(0, 0, w, h);
+  if (!song) return;
+  const keys = kbLayout(), byMidi = new Map(keys.map(k => [k.m, k]));
+  // lanes: black-key columns slightly darker, a line at every C and F
+  for (const k of keys) {
+    if (k.black) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(k.x, 0, k.w, h); }
+    else if (k.m % 12 === 0 || k.m % 12 === 5) { g.fillStyle = k.m % 12 === 0 ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.04)'; g.fillRect(Math.round(k.x), 0, 1, h); }
+  }
+  const ppb = Math.max(46, h / 5.5) * (song.zoom || 1), y0 = h;
+  const yAt = beat => y0 - (beat - S.beat) * ppb;
+  // bar lines
+  const pk = song.pickup || 0;
+  g.fillStyle = 'rgba(255,255,255,.07)';
+  for (let k = pk > 0 ? 0 : 1; ; k++) {
+    const b = pk + k * song.bpb, y = yAt(b);
+    if (b > S.endBeat + 1e-6 || y < -2) break;
+    if (y <= h) g.fillRect(0, Math.round(y), w, 1);
+  }
+  // notes: white-key notes first, black-key notes on top
+  const targets = new Set(currentTargets()), names = $('#optNames').checked;
+  const order = S.notes.filter(n => byMidi.has(n.midi)).sort((a, b) => IS_BLACK[a.midi % 12] - IS_BLACK[b.midi % 12]);
+  for (const n of order) {
+    const k = byMidi.get(n.midi), yb = yAt(n.beat), yt = yb - Math.max(12, n.dur * ppb - 3);
+    if (yt > h || yb < 0) continue;
+    const active = isActive(n) || S.demo;
+    const pal = n.state === 'hit' ? FALL.hit : n.state === 'miss' ? FALL.miss : FALL[n.hand];
+    const pad = k.black ? 1 : 3, rx = k.x + pad, rw = k.w - 2 * pad;
+    g.save();
+    if (!active) g.globalAlpha = 0.22;
+    if (targets.has(n)) { g.shadowColor = pal[0]; g.shadowBlur = 18 + 6 * Math.sin(now / 150); }
+    const grd = g.createLinearGradient(0, yt, 0, yb);
+    grd.addColorStop(0, pal[0]); grd.addColorStop(1, pal[1]);
+    g.fillStyle = grd; g.beginPath(); g.roundRect(rx, yt, rw, yb - yt, Math.min(7, rw / 3)); g.fill();
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1; g.stroke();
+    if (names && yb - yt > 18 && rw > 13) {
+      g.fillStyle = 'rgba(22,16,44,.85)'; g.textAlign = 'center';
+      g.font = `800 ${rw > 24 ? 12 : 10}px Nunito,-apple-system,system-ui,sans-serif`;
+      g.fillText(noteName(n), rx + rw / 2, yb - 6);
+    }
+    g.restore();
+  }
+  // the line where notes meet the keys
+  const pulse = S.waiting ? 0.55 + 0.45 * Math.sin(now / 160) : 0.85;
+  const glow = g.createLinearGradient(0, h - 34, 0, h);
+  glow.addColorStop(0, 'rgba(109,139,255,0)'); glow.addColorStop(1, `rgba(109,139,255,${0.35 * pulse})`);
+  g.fillStyle = glow; g.fillRect(0, h - 34, w, 34);
+  g.fillStyle = `rgba(160,180,255,${pulse})`; g.fillRect(0, h - 2, w, 2);
+  // right notes burst, wrong notes flash their column red
+  S.ripples = S.ripples.filter(r => now - r.t < 500);
+  for (const r of S.ripples) {
+    const k = byMidi.get(r.n.midi); if (!k) continue;
+    const a = (now - r.t) / 500;
+    g.strokeStyle = `rgba(127,240,179,${1 - a})`; g.lineWidth = 3 * (1 - a) + 0.5;
+    g.beginPath(); g.arc(k.x + k.w / 2, h - 4, 6 + a * 26, Math.PI, Math.PI * 2); g.stroke();
+  }
+  S.ghosts = S.ghosts.filter(gh => now - gh.t < 600);
+  for (const gh of S.ghosts) {
+    const k = byMidi.get(gh.midi); if (!k) continue;
+    const a = 1 - (now - gh.t) / 600, gr = g.createLinearGradient(0, h - 90, 0, h);
+    gr.addColorStop(0, 'rgba(255,100,116,0)'); gr.addColorStop(1, `rgba(255,100,116,${0.7 * a})`);
+    g.fillStyle = gr; g.fillRect(k.x, h - 90, k.w, 90);
+  }
+  S.feedback = S.feedback.filter(f => now - f.t < 800);
+  g.textAlign = 'center'; g.font = '800 20px Nunito,-apple-system,system-ui,sans-serif';
+  for (const f of S.feedback) {
+    const a = (now - f.t) / 800;
+    g.globalAlpha = 1 - a; g.fillStyle = f.color === '#17a34a' ? '#7ff0b3' : '#ff9aa3';
+    g.fillText(f.text, w / 2, h * 0.38 - a * 18);
+  }
+  g.globalAlpha = 1;
 }
 
 /* ============================================================
    Drawing: keyboard
    ============================================================ */
 const IS_BLACK = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
+const KB_TOP = 11; // cabinet lip + red felt above the keys
 function kbLayout() {
   const w = kb.clientWidth, h = kb.clientHeight;
   const whites = []; for (let m = S.kbLo; m <= S.kbHi; m++) if (!IS_BLACK[m % 12]) whites.push(m);
-  const ww = w / whites.length, bw = ww * 0.62, bh = h * 0.62;
+  const ww = w / whites.length, bw = ww * 0.58, wh = h - KB_TOP - 4, bh = wh * 0.62;
   const keys = [];
-  whites.forEach((m, i) => keys.push({ m, x: i * ww, w: ww, h, black: false }));
+  whites.forEach((m, i) => keys.push({ m, x: i * ww, w: ww, h: wh, black: false }));
   for (let m = S.kbLo; m <= S.kbHi; m++) if (IS_BLACK[m % 12]) {
     const i = whites.indexOf(m - 1); if (i >= 0) keys.push({ m, x: (i + 1) * ww - bw / 2, w: bw, h: bh, black: true });
   }
   return keys;
 }
+function roundBottom(c, x, y, w, h, r) {
+  c.beginPath(); c.moveTo(x, y); c.lineTo(x + w, y); c.lineTo(x + w, y + h - r);
+  c.quadraticCurveTo(x + w, y + h, x + w - r, y + h); c.lineTo(x + r, y + h);
+  c.quadraticCurveTo(x, y + h, x, y + h - r); c.closePath();
+}
+// [top, bottom, front lip] for ivory keys; [top, bottom, cap top, cap bottom] for ebony keys
+const IVORY = { normal: ['#fffef8', '#f3eed9', '#e0d9be'], target: ['#e8eeff', '#b3c6ff', '#90a9f3'], good: ['#e3fbef', '#8ce5b3', '#62c98f'], bad: ['#ffe8eb', '#ffa0a9', '#e8747f'], neutral: ['#ebf0ff', '#bfcfff', '#99aff0'] };
+const EBONY = { normal: ['#34343a', '#0e0e10', '#4f4f56', '#1c1c1f'], target: ['#6a89f3', '#2b4cc2', '#91a9f7', '#3a5ad0'], good: ['#44d486', '#137a3f', '#7de6ab', '#1f9a56'], bad: ['#ff717e', '#b32535', '#ffa0a8', '#d23a4a'], neutral: ['#7f97f2', '#3654c4', '#a3b6f5', '#4561cc'] };
 function drawKeyboard() {
   const w = kb.clientWidth, h = kb.clientHeight, now = performance.now();
-  gk.fillStyle = '#0b0e1a'; gk.fillRect(0, 0, w, h);
+  gk.clearRect(0, 0, w, h);
   const targets = new Set(currentTargets().map(n => n.midi));
   if (calib.c && calib.c.phase === 'notes') targets.add(calib.c.target);
-  const colorFor = (m, black) => {
-    const f = S.flash.get(m);
-    if (f && f.until > now) return f.kind === 'good' ? '#34d17c' : f.kind === 'bad' ? '#ff5d6c' : '#9fb4ff';
-    if (targets.has(m)) return black ? '#3a64e0' : '#8fb0ff';
-    return black ? '#15182a' : '#f7f7fb';
-  };
+  const stateOf = m => { const f = S.flash.get(m); return f && f.until > now ? f.kind : targets.has(m) ? 'target' : 'normal'; };
+  // cabinet: dark lip, red felt, dark rim under the keys
+  const lip = gk.createLinearGradient(0, 0, 0, KB_TOP - 3);
+  lip.addColorStop(0, '#6a6a70'); lip.addColorStop(1, '#232327');
+  gk.fillStyle = lip; gk.fillRect(0, 0, w, KB_TOP - 3);
+  gk.fillStyle = '#a3231d'; gk.fillRect(0, KB_TOP - 3, w, 3);
+  gk.fillStyle = '#121214'; gk.fillRect(0, h - 5, w, 5);
   const keys = kbLayout(), heardKeys = [];
-  for (const k of keys) {
-    gk.fillStyle = colorFor(k.m, k.black);
-    if (k.black) { gk.fillRect(k.x, 0, k.w, k.h); }
-    else { gk.fillRect(k.x + 1, 0, k.w - 2, k.h - 1); }
-    const f = S.flash.get(k.m);
-    if (f && f.until > now) heardKeys.push(k);
-    if (!k.black) {
-      gk.textAlign = 'center'; gk.font = '600 11px -apple-system,system-ui,sans-serif';
-      if (k.m % 12 === 0) { gk.fillStyle = '#7a809e'; gk.fillText('До' + (k.m / 12 - 1), k.x + k.w / 2, h - 8); }
+  for (const k of keys) { const f = S.flash.get(k.m); if (f && f.until > now) heardKeys.push(k); }
+  // ivory keys
+  for (const k of keys.filter(k => !k.black)) {
+    const st = stateOf(k.m), [c0, c1, cl] = IVORY[st], down = st !== 'normal' && st !== 'target';
+    const lipH = down ? 3 : 7, x = k.x + 0.5, kw = k.w - 1;
+    const gr = gk.createLinearGradient(0, KB_TOP, 0, KB_TOP + k.h);
+    gr.addColorStop(0, c0); gr.addColorStop(1, c1);
+    gk.fillStyle = gr; roundBottom(gk, x, KB_TOP, kw, k.h, 4); gk.fill();
+    gk.fillStyle = cl; roundBottom(gk, x, KB_TOP + k.h - lipH, kw, lipH, 4); gk.fill();
+    gk.fillStyle = 'rgba(255,255,255,.7)'; gk.fillRect(x + 1, KB_TOP + k.h - lipH - 1, kw - 2, 1);
+    if (k.x > 0) { gk.fillStyle = '#a39d89'; gk.fillRect(Math.round(k.x), KB_TOP, 1, k.h - 2); }
+    if (k.m % 12 === 0) {
+      gk.textAlign = 'center'; gk.font = `700 ${Math.max(10, Math.min(22, k.w * 0.44))}px Nunito,-apple-system,system-ui,sans-serif`;
+      gk.fillStyle = k.m === 60 ? '#7b7666' : '#c6c1ad';
+      gk.fillText('До' + (k.m / 12 - 1), k.x + k.w / 2, KB_TOP + k.h - lipH - 9);
     }
   }
+  // the felt casts a soft shadow onto the keys
+  const sh = gk.createLinearGradient(0, KB_TOP, 0, KB_TOP + 12);
+  sh.addColorStop(0, 'rgba(0,0,0,.28)'); sh.addColorStop(1, 'rgba(0,0,0,0)');
+  gk.fillStyle = sh; gk.fillRect(0, KB_TOP, w, 12);
+  // ebony keys with a raised front cap and a drop shadow
+  for (const k of keys.filter(k => k.black)) {
+    const st = stateOf(k.m), [c0, c1, p0, p1] = EBONY[st], capH = Math.max(7, k.h * 0.15);
+    gk.save();
+    gk.shadowColor = 'rgba(0,0,0,.5)'; gk.shadowBlur = 6; gk.shadowOffsetX = 3; gk.shadowOffsetY = 3;
+    const gr = gk.createLinearGradient(0, KB_TOP, 0, KB_TOP + k.h);
+    gr.addColorStop(0, c0); gr.addColorStop(1, c1);
+    gk.fillStyle = gr; roundBottom(gk, k.x, KB_TOP - 1, k.w, k.h + 1, 3); gk.fill();
+    gk.restore();
+    const sheen = gk.createLinearGradient(k.x, 0, k.x + k.w, 0);
+    sheen.addColorStop(0, 'rgba(255,255,255,0)'); sheen.addColorStop(0.35, 'rgba(255,255,255,.09)'); sheen.addColorStop(1, 'rgba(255,255,255,0)');
+    gk.fillStyle = sheen; gk.fillRect(k.x + 1, KB_TOP, k.w - 2, k.h - capH - 2);
+    const cg = gk.createLinearGradient(0, KB_TOP + k.h - capH - 2, 0, KB_TOP + k.h - 2);
+    cg.addColorStop(0, p0); cg.addColorStop(1, p1);
+    gk.fillStyle = cg; roundBottom(gk, k.x + 2, KB_TOP + k.h - capH - 2, k.w - 4, capH, 3); gk.fill();
+    gk.fillStyle = 'rgba(255,255,255,.22)'; gk.fillRect(k.x + 3, KB_TOP + k.h - capH - 2, k.w - 6, 1);
+  }
   // name every key that was just heard, on a small tag in the lower part of the keyboard
-  gk.font = '700 12px -apple-system,system-ui,sans-serif'; gk.textAlign = 'center';
+  gk.font = '800 12px Nunito,-apple-system,system-ui,sans-serif'; gk.textAlign = 'center';
   for (const k of heardKeys) {
-    const label = midiName(k.m), tw = gk.measureText(label).width + 10, cx = k.x + k.w / 2, y = h - 34;
-    gk.fillStyle = 'rgba(11,14,26,.85)';
-    gk.beginPath(); gk.roundRect(cx - tw / 2, y - 13, tw, 18, 5); gk.fill();
-    gk.fillStyle = '#fff'; gk.fillText(label, cx, y);
+    const label = midiName(k.m), tw = gk.measureText(label).width + 12, cx = k.x + k.w / 2, y = h - 40;
+    gk.fillStyle = 'rgba(19,17,30,.88)';
+    gk.beginPath(); gk.roundRect(cx - tw / 2, y - 13, tw, 19, 6); gk.fill();
+    gk.fillStyle = '#fff'; gk.fillText(label, cx, y + 1);
   }
 }
 /* ============================================================
@@ -1281,6 +1462,7 @@ function updateStats() {
 }
 function updateButtons() {
   $('#btnPlay').textContent = S.playing && !S.demo ? '⏸ Пауза' : '▶ Старт';
+  $('#fPlay').textContent = S.playing && !S.demo ? '⏸ Пауза' : '▶ Старт';
   $('#btnDemo').textContent = S.demo ? '⏹ Спри' : '👂 Чуй как звучи';
 }
 function syncSegs() {
@@ -1296,9 +1478,9 @@ function updatePrompt() {
   if (S.playing && !S.demo) {
     const t = currentTargets();
     if (t.length) {
-      const byHand = h => t.filter(n => n.hand === h).map(n => noteName(n)).join(' + ');
+      const byHand = h => t.filter(n => n.hand === h).map(n => `<span class="nchip">${noteName(n)}</span>`).join('');
       const r = byHand('R'), l = byHand('L');
-      html = (S.mode === 'wait' ? 'Изсвири: ' : 'Сега: ') + [r && `${r} <span class="dim">(дясна)</span>`, l && `${l} <span class="dim">(лява)</span>`].filter(Boolean).join(' &nbsp; ');
+      html = `<span class="dim">${S.mode === 'wait' ? 'Изсвири' : 'Сега'}</span>` + [l && `<span class="hand">лява</span>${l}`, r && `<span class="hand">дясна</span>${r}`].filter(Boolean).join('');
     }
   } else if (S.demo) html = '<span class="dim">Слушай как звучи…</span>';
   if (html !== lastPrompt) { $('#prompt').innerHTML = html; lastPrompt = html; }
@@ -1343,10 +1525,26 @@ $('#overlay').addEventListener('click', e => {
   else if (act === 'lib') openLibrary();
   else if (act === 'next') { const all = allSongs(), i = all.indexOf(S.song); loadSong(all[(i + 1) % all.length].id); }
 });
+function setView(v) {
+  S.view = v === 'fall' ? 'fall' : 'staff'; store.set('view', S.view);
+  $('.stage').classList.toggle('fall', S.view === 'fall');
+  document.querySelectorAll('#view button').forEach(b => b.classList.toggle('on', b.dataset.v === S.view));
+  $('#fView').textContent = S.view === 'fall' ? '🎼 Ноти' : '🌧 Водопад';
+  resize();
+}
+function setFocus(on) {
+  S.focus = on; document.body.classList.toggle('focus', on);
+  requestAnimationFrame(resize);
+}
 function togglePlay() { if (S.demo) { reset(); return; } S.playing ? pause() : play(); }
 $('#btnPlay').onclick = e => { e.currentTarget.blur(); togglePlay(); };
 $('#btnRestart').onclick = e => { e.currentTarget.blur(); reset(); };
 $('#btnDemo').onclick = e => { e.currentTarget.blur(); S.demo ? reset() : startDemo(); };
+$('#btnFocus').onclick = e => { e.currentTarget.blur(); setFocus(true); };
+$('#fPlay').onclick = e => { e.currentTarget.blur(); togglePlay(); };
+$('#fView').onclick = e => { e.currentTarget.blur(); setView(S.view === 'fall' ? 'staff' : 'fall'); };
+$('#fExit').onclick = e => { e.currentTarget.blur(); setFocus(false); };
+document.querySelectorAll('#view button').forEach(b => b.onclick = () => { b.blur(); setView(b.dataset.v); });
 $('#btnMic').onclick = e => { e.currentTarget.blur(); toggleMic(); };
 $('#sens').oninput = applySens;
 $('#btnCal').onclick = e => { e.currentTarget.blur(); startCalibration(); };
@@ -1509,12 +1707,15 @@ function frame(ts) {
   S.lastTs = ts;
   if (mic.active) processMic();
   if (S.playing) { update(dt); updatePrompt(); }
-  drawStaff(); drawKeyboard();
+  if (S.view === 'fall') drawFall(); else drawStaff();
+  drawKeyboard();
   requestAnimationFrame(frame);
 }
 window.addEventListener('resize', resize);
+new ResizeObserver(() => resize()).observe(cv);
 
 S.hands = store.get('hands', 'R'); S.mode = store.get('mode', 'wait');
+setView(store.get('view', 'staff'));
 loadSong(store.get('song', 'hotcross'));
 requestAnimationFrame(frame);
 
