@@ -1,0 +1,1662 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Пиано учител</title>
+<style>
+:root{
+  --bg:#0f1220; --panel:#181c30; --panel-2:#222843; --ink:#eceefa; --muted:#9097bd; --border:#2e3558;
+  --accent:#5b8cff; --good:#34d17c; --bad:#ff5d6c; --warn:#ffbf4d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;cursor:pointer}
+button:hover{border-color:#4a5596}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button.on{background:#2a3a73;border-color:var(--accent)}
+.app{max-width:1280px;margin:0 auto;padding:12px 16px 28px;display:flex;flex-direction:column;gap:12px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.brand{font-weight:700;font-size:18px;margin-right:auto}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:var(--panel);padding:7px 12px}
+.seg button+button{border-left:1px solid var(--border)}
+.seg button.on{background:var(--accent);color:#fff}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
+label{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+label b{color:var(--ink);min-width:2.2em}
+input[type=range]{accent-color:var(--accent);width:120px}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.songbtn{display:flex;flex-direction:column;align-items:flex-start;min-width:230px;text-align:left;padding:6px 14px}
+.songbtn span{font-weight:600}
+.songbtn small{color:var(--muted);font-size:12px}
+.meter{width:110px;height:8px;background:#0b0e1a;border-radius:4px;overflow:hidden;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--good),var(--warn) 70%,var(--bad))}
+#heard{min-width:8em;font-weight:600;color:var(--ink)}
+#inStatus{color:var(--muted);font-size:14px}
+#diag{color:var(--muted);font-size:13px}
+.calbar{height:6px;background:#0b0e1a;border-radius:3px;overflow:hidden;margin:10px 0}
+.calbar i{display:block;height:100%;background:var(--accent)}
+.mini{--kw:42px;--bw:26px;position:relative;display:flex;width:max-content;margin:14px auto 4px}
+.mini .w{width:var(--kw);height:124px;background:#f7f7fb;border:1px solid #b9bdd6;border-radius:0 0 8px 8px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;padding-bottom:8px;color:#1d1f2b;font-weight:700;font-size:13px}
+.mini .w .n{width:22px;height:22px;border-radius:50%;background:#e1e4f3;display:flex;align-items:center;justify-content:center;font-size:12px}
+.mini .w.cur{background:#9dbaff;animation:pulse 1s ease-in-out infinite alternate}
+.mini .w.cur .n{background:var(--accent);color:#fff}
+.mini .w.done{background:#c8f3da}
+.mini .w.done .n{background:var(--good);color:#fff}
+.mini .b{position:absolute;top:0;width:var(--bw);height:74px;background:#15182a;border-radius:0 0 5px 5px}
+.mini-hint{font-size:13px;color:var(--muted);margin:2px 0 0}
+.mini .w.hb{background:#ffb3bb;animation:none}
+.mini .w.hg{background:#8ee8b3;animation:none}
+.mini .b.hb{background:#ff5d6c}
+.mini .b.hg{background:#34d17c}
+@keyframes pulse{from{background:#9dbaff}to{background:#c3d4ff}}
+@media (max-width:440px){.mini{--kw:34px;--bw:21px}}
+.card .ok{color:var(--good);font-weight:600}
+.card .no{color:var(--warn);font-weight:600}
+.prompt{font-size:22px;font-weight:700;min-height:34px;text-align:center}
+.prompt .dim{color:var(--muted);font-weight:500;font-size:16px}
+.stage{position:relative;border-radius:14px;overflow:hidden;background:#fbf8f1;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+#staff{display:block;width:100%;height:290px}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,18,32,.5);backdrop-filter:blur(2px)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px 24px;max-width:460px;text-align:center}
+.card h2{margin:0 0 4px;font-size:22px}
+.card p{margin:6px 0;color:var(--muted)}
+.card .big{font-size:40px;font-weight:800;color:var(--ink);margin:6px 0}
+.card .stars{font-size:28px;color:var(--warn);letter-spacing:4px}
+.card .btns{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stats{display:flex;gap:14px;flex-wrap:wrap;margin-left:auto;color:var(--muted);font-size:14px}
+.stats b{color:var(--ink)}
+#kb{display:block;width:100%;height:150px;border-radius:10px}
+.hint{color:var(--muted);font-size:13px;margin:0;text-align:center}
+.hint kbd{background:var(--panel-2);border:1px solid var(--border);border-radius:5px;padding:0 5px;font:inherit;font-size:12px;color:var(--ink)}
+/* library */
+.lib{position:fixed;inset:0;background:rgba(8,10,20,.8);display:flex;justify-content:center;align-items:flex-start;padding:24px 16px;overflow:auto;z-index:10}
+.lib.cal{align-items:center}
+.lib.cal .card{max-width:520px;width:100%}
+.lib-inner{background:var(--panel);border:1px solid var(--border);border-radius:18px;max-width:980px;width:100%;padding:18px 20px 22px}
+.lib-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.lib-head h2{margin:0;margin-right:auto;font-size:20px}
+.lib h3{margin:18px 0 8px;font-size:15px;color:var(--muted);font-weight:600;display:flex;gap:10px;align-items:baseline}
+.lib h3 .lvl{color:var(--warn);letter-spacing:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.song{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border);cursor:pointer}
+.song:hover{border-color:#4a5596}
+.song .stars{color:var(--warn);font-size:12px;letter-spacing:1px}
+.song .del{position:absolute;top:6px;right:8px;color:var(--muted);padding:2px 6px;border-radius:6px}
+.song .del:hover{color:var(--bad);background:#2a1d2a}
+.imp{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;margin:8px 0 4px;background:var(--panel-2);border-radius:12px}
+.imp input[type=text]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:5px 8px;width:150px}
+#impMsg{font-size:13px;color:var(--muted)}
+.song.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.song b{font-size:15px}
+.song small{color:var(--muted);font-size:12px}
+.song .best{color:var(--good);font-size:12px;font-weight:600}
+@media (max-width:700px){
+  #staff{height:270px}
+  #kb{height:110px}
+  .brand{width:100%}
+  .stats{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">🎹 Пиано учител</div>
+    <button id="btnLib" class="songbtn"><span id="songTitle">—</span><small id="songMeta">Избери песен</small></button>
+    <div class="seg" id="hands" title="Коя ръка упражняваш">
+      <button data-v="R">Дясна</button><button data-v="L">Лява</button><button data-v="both">Двете</button>
+    </div>
+    <div class="seg" id="mode" title="Как тече песента">
+      <button data-v="wait">Изчаква ме</button><button data-v="realtime">В темп</button>
+    </div>
+  </header>
+
+  <div class="panel row">
+    <label>Темпо <input type="range" id="tempo" min="30" max="180" step="1"><b id="tempoVal">90</b></label>
+    <label><input type="checkbox" id="optNames" checked> Имена на нотите</label>
+    <label><input type="checkbox" id="optMetro" checked> Метроном</label>
+    <label title="Когато упражняваш една ръка, компютърът свири другата"><input type="checkbox" id="optAccomp" checked> Компютърът свири другата ръка</label>
+  </div>
+
+  <div class="panel row">
+    <button id="btnMic">🎤 Включи микрофона</button>
+    <button id="btnCal">🎚 Настройка</button>
+    <span id="inStatus">Сложи телефона или лаптопа близо до пианото и включи микрофона.</span>
+    <span id="micBox" class="row" hidden>
+      <span class="meter" title="Сила на звука"><i id="meterFill"></i></span>
+      <span>Чувам: <span id="heard">—</span></span>
+      <label title="При акустично пиано микрофонът понякога бърка октавата"><input type="checkbox" id="optOctave" checked> Приемай друга октава</label>
+      <label>Чувствителност <input type="range" id="sens" min="1" max="10" value="5"></label>
+      <span id="diag"></span>
+    </span>
+  </div>
+
+  <div class="prompt" id="prompt"></div>
+
+  <div class="stage">
+    <canvas id="staff"></canvas>
+    <div class="overlay" id="overlay"></div>
+  </div>
+
+  <div class="transport">
+    <button id="btnPlay" class="primary">▶ Старт</button>
+    <button id="btnRestart">↺ Отначало</button>
+    <button id="btnDemo">👂 Чуй как звучи</button>
+    <div class="stats">
+      <span>Точни <b id="stHit">0</b></span>
+      <span>Грешни <b id="stWrong">0</b></span>
+      <span>Пропуснати <b id="stMiss">0</b></span>
+      <span>Серия <b id="stStreak">0</b></span>
+      <span>Точност <b id="stAcc">—</b></span>
+    </div>
+  </div>
+
+  <canvas id="kb"></canvas>
+  <p class="hint">Синият клавиш е нотата, която трябва да изсвириш · <kbd>Интервал</kbd> старт/пауза</p>
+</div>
+
+<div class="lib cal" id="calModal" hidden></div>
+
+<div class="lib" id="lib" hidden>
+  <div class="lib-inner">
+    <div class="lib-head"><h2>📚 Песни</h2><button id="btnLibClose">Затвори</button></div>
+    <div class="imp">
+      <button id="btnImport">📁 Внеси MIDI файл</button>
+      <label>в секция <input id="impCat" type="text" value="Хари Потър"></label>
+      <input type="file" id="impFile" accept=".mid,.midi,audio/midi,audio/x-midi" multiple hidden>
+      <span id="impMsg"></span>
+    </div>
+    <div id="libBody"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+
+/* ============================================================
+   Music helpers
+   ============================================================ */
+const PCS = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};
+const LETTERS = 'CDEFGAB';
+const BG = ['До','Ре','Ми','Фа','Сол','Ла','Си'];
+const SHARP_IDX = [0,0,1,1,2,3,3,4,4,5,5,6];
+const SHARP_ACC = [0,1,0,1,0,0,1,0,1,0,1,0];
+
+function parseNote(s) {
+  const m = /^([A-G])(#|b)?(\d)$/.exec(s);
+  if (!m) throw new Error('Лоша нота: ' + s);
+  const oct = +m[3], acc = m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0;
+  const li = LETTERS.indexOf(m[1]);
+  return { midi: (oct + 1) * 12 + PCS[m[1]] + acc, diat: oct * 7 + li, letter: m[1], acc };
+}
+const FLAT_IDX = [0,1,1,2,2,3,4,4,5,5,6,6];
+const FLAT_ACC = [0,-1,0,-1,0,0,-1,0,-1,0,-1,0];
+function midiInfo(m, flats) {
+  const pc = ((m % 12) + 12) % 12, oct = Math.floor(m / 12) - 1;
+  const li = (flats ? FLAT_IDX : SHARP_IDX)[pc];
+  return { midi: m, diat: oct * 7 + li, letter: LETTERS[li], acc: (flats ? FLAT_ACC : SHARP_ACC)[pc], oct };
+}
+function noteName(n, withOct) {
+  const li = LETTERS.indexOf(n.letter);
+  const acc = n.acc > 0 ? '♯' : n.acc < 0 ? '♭' : '';
+  return BG[li] + acc + (withOct ? (Math.floor(n.diat / 7)) : '');
+}
+const midiName = (m, withOct) => noteName(midiInfo(m), withOct);
+
+const parseDur = x => { const [a, b] = x.split('/'); return b === undefined ? parseFloat(a) : parseFloat(a) / parseFloat(b); };
+// "C4:1 D4:0.5 E4:1/3 R:1 C3+E3+G3:2 | ..." -> notes (durations in quarter-note beats)
+function parsePart(str, hand, start) {
+  const out = []; let t = start || 0;
+  for (const tok of str.trim().split(/\s+/)) {
+    if (!tok || tok === '|') continue;
+    const i = tok.lastIndexOf(':');
+    const head = tok.slice(0, i), dur = parseDur(tok.slice(i + 1));
+    if (!(dur > 0)) throw new Error('Лоша дължина: ' + tok);
+    if (head !== 'R') for (const nn of head.split('+')) out.push({ ...parseNote(nn), beat: t, dur, hand });
+    t += dur;
+  }
+  return out;
+}
+
+/* ============================================================
+   Song library (public-domain melodies, simple arrangements)
+   ============================================================ */
+function preludeParts() {
+  const bars = [
+    ['C4+E4', 'G4 C5 E5'], ['C4+D4', 'A4 D5 F5'], ['B3+D4', 'G4 D5 F5'], ['C4+E4', 'G4 C5 E5'],
+    ['C4+E4', 'A4 E5 A5'], ['C4+D4', 'F#4 A4 D5'], ['B3+D4', 'G4 D5 G5'], ['B3+C4', 'E4 G4 C5'],
+  ];
+  let rh = [], lh = [];
+  for (const [l, r] of bars) {
+    const [a, b, c] = r.split(' ');
+    const half = `R:0.5 ${a}:0.25 ${b}:0.25 ${c}:0.25 ${a}:0.25 ${b}:0.25 ${c}:0.25`;
+    rh.push(half + ' ' + half); lh.push(`${l}:2 ${l}:2`);
+  }
+  rh.push('C5+E5+G5:4'); lh.push('C3+C4:4');
+  return { rh: rh.join(' | '), lh: lh.join(' | ') };
+}
+const PRELUDE = preludeParts();
+
+const triplets = (...groups) => groups.map(([a, b, c]) => `${a}:1/3 ${b}:1/3 ${c}:1/3`).join(' ');
+const MOUNTAIN_RH = 'B3:0.5 C#4:0.5 D4:0.5 E4:0.5 F#4:0.5 D4:0.5 F#4:1 | E#4:0.5 C#4:0.5 E#4:1 E4:0.5 C4:0.5 E4:1 | B3:0.5 C#4:0.5 D4:0.5 E4:0.5 F#4:0.5 D4:0.5 F#4:0.5 B4:0.5 | A4:0.5 F#4:0.5 D4:0.5 F#4:0.5 A4:2';
+const MOUNTAIN_LH = 'B2:1 F#2:1 B2:1 F#2:1 | C#3:2 C3:2 | B2:1 F#2:1 B2:1 F#2:1 | D3:2 F#2:2';
+const BELLS = 'Bb4:1 A4:0.5 Bb4:0.5 G4:1', BELLS_HI = 'D5:1 C5:0.5 D5:0.5 Bb4:1', BELLS_LH = 'Bb3:1 A3:0.5 Bb3:0.5 G3:1';
+const rpt = (x, n) => Array(n).fill(x).join(' | ');
+
+const LEVELS = {1: 'Първи стъпки', 2: 'Лесни', 3: 'Средни', 4: 'Предизвикателство'};
+const SECTIONS = { one: '✋ Една ръка — за начинаещи', magic: '🪄 Магия' };
+const SONGS = [
+  { id:'hotcross', cat:'one', level:1, title:'Горещи кифлички', composer:'Народна, Англия', bpm:90, bpb:4,
+    rh:'E4:1 D4:1 C4:2 | E4:1 D4:1 C4:2 | C4:0.5 C4:0.5 C4:0.5 C4:0.5 D4:0.5 D4:0.5 D4:0.5 D4:0.5 | E4:1 D4:1 C4:2' },
+  { id:'entchen', cat:'one', level:1, title:'Всички мои патенца', composer:'Народна, Германия', bpm:100, bpb:4,
+    rh:'C4:1 D4:1 E4:1 F4:1 | G4:2 G4:2 | A4:1 A4:1 A4:1 A4:1 | G4:4 | A4:1 A4:1 A4:1 A4:1 | G4:4 | F4:1 F4:1 F4:1 F4:1 | E4:2 E4:2 | D4:1 D4:1 D4:1 D4:1 | C4:4' },
+  { id:'hans', cat:'one', level:1, title:'Малкият Ханс', composer:'Народна, Германия', bpm:100, bpb:4,
+    rh:'G4:1 E4:1 E4:2 | F4:1 D4:1 D4:2 | C4:1 D4:1 E4:1 F4:1 | G4:1 G4:1 G4:2 | G4:1 E4:1 E4:2 | F4:1 D4:1 D4:2 | C4:1 E4:1 G4:1 G4:1 | C4:4' },
+  { id:'lune', cat:'one', level:1, title:'На лунна светлина', composer:'Народна, Франция', bpm:90, bpb:4,
+    rh:'C4:1 C4:1 C4:1 D4:1 | E4:2 D4:2 | C4:1 E4:1 D4:1 D4:1 | C4:4 | C4:1 C4:1 C4:1 D4:1 | E4:2 D4:2 | C4:1 E4:1 D4:1 D4:1 | C4:4 | D4:1 D4:1 D4:1 D4:1 | A3:2 A3:2 | D4:1 C4:1 B3:1 A3:1 | G3:4 | C4:1 C4:1 C4:1 D4:1 | E4:2 D4:2 | C4:1 E4:1 D4:1 D4:1 | C4:4' },
+  { id:'macdonald', cat:'one', level:1, title:'Старият Макдоналд', composer:'Народна, САЩ', bpm:100, bpb:4,
+    rh:'G4:1 G4:1 G4:1 D4:1 | E4:1 E4:1 D4:2 | B4:1 B4:1 A4:1 A4:1 | G4:3 D4:1 | G4:1 G4:1 G4:1 D4:1 | E4:1 E4:1 D4:2 | B4:1 B4:1 A4:1 A4:1 | G4:4' },
+  { id:'row', cat:'one', level:1, title:'Гребе, гребе лодката', composer:'Народна, Англия', bpm:90, bpb:3, ts:'6/8', tick:1.5,
+    rh:'C4:1.5 C4:1.5 | C4:1 D4:0.5 E4:1.5 | E4:1 D4:0.5 E4:1 F4:0.5 | G4:3 | C5:0.5 C5:0.5 C5:0.5 G4:0.5 G4:0.5 G4:0.5 | E4:0.5 E4:0.5 E4:0.5 C4:0.5 C4:0.5 C4:0.5 | G4:1 F4:0.5 E4:1 D4:0.5 | C4:3' },
+  { id:'yankee', cat:'one', level:1, title:'Янки Дудъл', composer:'Народна, САЩ', bpm:110, bpb:4,
+    rh:'C4:1 C4:1 D4:1 E4:1 | C4:1 E4:1 D4:1 G3:1 | C4:1 C4:1 D4:1 E4:1 | C4:2 B3:2 | C4:1 C4:1 D4:1 E4:1 | F4:1 E4:1 D4:1 C4:1 | B3:1 G3:1 A3:1 B3:1 | C4:2 C4:2' },
+
+  { id:'waltz', cat:'magic', level:2, title:'Вълшебен валс', composer:'Оригинална мелодия', bpm:100, bpb:3, key:['F#'],
+    rh:'E5:1 D#5:0.5 E5:0.5 B4:1 | C5:1.5 B4:0.5 A4:1 | G4:1 F#4:0.5 G4:0.5 E4:1 | B4:3 | E5:1 D#5:0.5 E5:0.5 G5:1 | F#5:1.5 E5:0.5 D#5:1 | E5:1 B4:1 G4:1 | E4:3',
+    lh:'E3:3 | A2:3 | E3:3 | B2:3 | E3:3 | B2:3 | E3:3 | E2+B2:3' },
+  { id:'bells', cat:'magic', level:2, title:'Звънчетата (Щедрик)', composer:'Микола Леонтович', bpm:110, bpb:3, key:['Bb','Eb'],
+    rh:`${rpt(BELLS, 4)} | ${rpt(BELLS_HI, 4)} | G4+Bb4+D5:3`,
+    lh:`${rpt('G3:3', 4)} | ${rpt(BELLS_LH, 4)} | G2+G3:3` },
+  { id:'mountain', cat:'magic', level:3, title:'В пещерата на планинския цар', composer:'Едвард Григ', bpm:100, bpb:4, key:['F#','C#'], zoom:1.3,
+    rh:`${MOUNTAIN_RH} | ${MOUNTAIN_RH} | B3+D4+F#4:4`, lh:`${MOUNTAIN_LH} | ${MOUNTAIN_LH} | B2:4` },
+  { id:'toccata', cat:'magic', level:3, title:'Токата в ре минор', composer:'Йохан Себастиан Бах', bpm:60, bpb:4, key:['Bb'], zoom:1.4,
+    rh:'A5:0.25 G5:0.25 A5:1.5 R:2 | G5:0.25 F5:0.25 E5:0.25 D5:0.25 C#5:1 D5:2 | A4:0.25 G4:0.25 A4:1.5 R:2 | E4:0.5 F4:0.5 C#4:1 D4:2 | R:4 | R:4 | D4+F4+A4:4',
+    lh:'R:4 | R:4 | R:4 | R:4 | A3:0.25 G3:0.25 A3:1.5 R:2 | G3:0.25 F3:0.25 E3:0.25 D3:0.25 C#3:1 D3:2 | D2+D3:4' },
+  { id:'moonlight', cat:'magic', level:3, title:'Лунна соната (начало)', composer:'Лудвиг ван Бетовен', bpm:50, bpb:4, key:['F#','C#','G#','D#'], zoom:1.5,
+    rh:[
+      triplets(['G#3','C#4','E4'], ['G#3','C#4','E4'], ['G#3','C#4','E4'], ['G#3','C#4','E4']),
+      triplets(['G#3','C#4','E4'], ['G#3','C#4','E4'], ['G#3','C#4','E4'], ['G#3','C#4','E4']),
+      triplets(['A3','C#4','E4'], ['A3','C#4','E4'], ['A3','D4','F#4'], ['A3','D4','F#4']),
+      triplets(['G#3','B#3','F#4'], ['G#3','C#4','E4'], ['G#3','C#4','D#4'], ['F#3','B#3','D#4']),
+      'G#3+C#4+E4:4'].join(' | '),
+    lh:'C#2+C#3:4 | B2:4 | A2:2 F#2:2 | G#2:4 | C#2+C#3:4' },
+
+  { id:'scale', level:1, title:'Гама До мажор', composer:'Упражнение', bpm:80, bpb:4,
+    rh:'C4:1 D4:1 E4:1 F4:1 | G4:1 A4:1 B4:1 C5:1 | C5:1 B4:1 A4:1 G4:1 | F4:1 E4:1 D4:1 C4:1',
+    lh:'C3:1 D3:1 E3:1 F3:1 | G3:1 A3:1 B3:1 C4:1 | C4:1 B3:1 A3:1 G3:1 | F3:1 E3:1 D3:1 C3:1' },
+  { id:'mary', level:1, title:'Мери имаше агънце', composer:'Народна, САЩ', bpm:90, bpb:4,
+    rh:'E4:1 D4:1 C4:1 D4:1 | E4:1 E4:1 E4:2 | D4:1 D4:1 D4:2 | E4:1 G4:1 G4:2 | E4:1 D4:1 C4:1 D4:1 | E4:1 E4:1 E4:1 E4:1 | D4:1 D4:1 E4:1 D4:1 | C4:4',
+    lh:'C3:4 | C3:4 | G2:4 | C3:4 | C3:4 | C3:4 | G2:4 | C3:4' },
+  { id:'frere', level:1, title:'Братче Жак', composer:'Народна, Франция', bpm:100, bpb:4,
+    rh:'C4:1 D4:1 E4:1 C4:1 | C4:1 D4:1 E4:1 C4:1 | E4:1 F4:1 G4:2 | E4:1 F4:1 G4:2 | G4:0.5 A4:0.5 G4:0.5 F4:0.5 E4:1 C4:1 | G4:0.5 A4:0.5 G4:0.5 F4:0.5 E4:1 C4:1 | C4:1 G3:1 C4:2 | C4:1 G3:1 C4:2',
+    lh:'C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | C3:2 G2:2 | C3:4' },
+  { id:'twinkle', level:1, title:'Блещи, блещи, звездице', composer:'Народна, Франция', bpm:90, bpb:4,
+    rh:'C4:1 C4:1 G4:1 G4:1 | A4:1 A4:1 G4:2 | F4:1 F4:1 E4:1 E4:1 | D4:1 D4:1 C4:2 | G4:1 G4:1 F4:1 F4:1 | E4:1 E4:1 D4:2 | G4:1 G4:1 F4:1 F4:1 | E4:1 E4:1 D4:2 | C4:1 C4:1 G4:1 G4:1 | A4:1 A4:1 G4:2 | F4:1 F4:1 E4:1 E4:1 | D4:1 D4:1 C4:2',
+    lh:'C3:4 | F3:2 C3:2 | F3:2 C3:2 | G2:2 C3:2 | C3:2 G2:2 | C3:2 G2:2 | C3:2 G2:2 | C3:2 G2:2 | C3:4 | F3:2 C3:2 | F3:2 C3:2 | G2:2 C3:2' },
+  { id:'ode', level:1, title:'Ода на радостта', composer:'Лудвиг ван Бетовен', bpm:90, bpb:4,
+    rh:'E4:1 E4:1 F4:1 G4:1 | G4:1 F4:1 E4:1 D4:1 | C4:1 C4:1 D4:1 E4:1 | E4:1.5 D4:0.5 D4:2 | E4:1 E4:1 F4:1 G4:1 | G4:1 F4:1 E4:1 D4:1 | C4:1 C4:1 D4:1 E4:1 | D4:1.5 C4:0.5 C4:2',
+    lh:'C3:4 | G2:4 | C3:4 | G2:4 | C3:4 | G2:4 | C3:4 | G2:2 C3:2' },
+
+  { id:'jingle', level:2, title:'Джингъл Белс', composer:'Джеймс Пиърпонт', bpm:110, bpb:4,
+    rh:'E4:1 E4:1 E4:2 | E4:1 E4:1 E4:2 | E4:1 G4:1 C4:1.5 D4:0.5 | E4:4 | F4:1 F4:1 F4:1.5 F4:0.5 | F4:1 E4:1 E4:1 E4:0.5 E4:0.5 | E4:1 D4:1 D4:1 E4:1 | D4:2 G4:2 | E4:1 E4:1 E4:2 | E4:1 E4:1 E4:2 | E4:1 G4:1 C4:1.5 D4:0.5 | E4:4 | F4:1 F4:1 F4:1.5 F4:0.5 | F4:1 E4:1 E4:1 E4:0.5 E4:0.5 | G4:1 G4:1 F4:1 D4:1 | C4:4',
+    lh:'C3:4 | C3:4 | C3:4 | C3:4 | F2:4 | C3:4 | G2:4 | G2:4 | C3:4 | C3:4 | C3:4 | C3:4 | F2:4 | C3:4 | G2:4 | C3:4' },
+  { id:'birthday', level:2, title:'Честит рожден ден', composer:'Сестри Хил', bpm:90, bpb:3, pickup:1,
+    rh:'G4:0.75 G4:0.25 | A4:1 G4:1 C5:1 | B4:2 G4:0.75 G4:0.25 | A4:1 G4:1 D5:1 | C5:2 G4:0.75 G4:0.25 | G5:1 E5:1 C5:1 | B4:1 A4:1 F5:0.75 F5:0.25 | E5:1 C5:1 D5:1 | C5:3',
+    lh:'C3:3 | G2:3 | G2:3 | C3:3 | C3:3 | F2:3 | C3:2 G2:1 | C3:3', lhStart:1 },
+  { id:'london', level:2, title:'Лондонският мост', composer:'Народна, Англия', bpm:100, bpb:4,
+    rh:'G4:1.5 A4:0.5 G4:1 F4:1 | E4:1 F4:1 G4:2 | D4:1 E4:1 F4:2 | E4:1 F4:1 G4:2 | G4:1.5 A4:0.5 G4:1 F4:1 | E4:1 F4:1 G4:2 | D4:2 G4:2 | E4:1 C4:3',
+    lh:'C3:4 | C3:4 | G2:4 | C3:4 | C3:4 | C3:4 | G2:4 | C3:4' },
+  { id:'saints', level:2, title:'Когато светците маршируват', composer:'Спиричуъл', bpm:110, bpb:4,
+    rh:'R:1 C4:1 E4:1 F4:1 | G4:4 | R:1 C4:1 E4:1 F4:1 | G4:4 | R:1 C4:1 E4:1 F4:1 | G4:2 E4:2 | C4:2 E4:2 | D4:4 | R:1 E4:1 E4:1 D4:1 | C4:3 C4:1 | E4:2 G4:2 | G4:2 F4:2 | R:2 E4:1 F4:1 | G4:2 E4:2 | C4:2 D4:2 | C4:4',
+    lh:'C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | C3:4 | G2:4 | C3:4 | C3:4 | C3:4 | C3:2 F2:2 | F2:4 | C3:4 | G2:4 | C3:4' },
+  { id:'merry', level:2, title:'Весела Коледа', composer:'Народна, Англия', bpm:110, bpb:3, pickup:1,
+    rh:'G4:1 | C5:1 C5:0.5 D5:0.5 C5:0.5 B4:0.5 | A4:1 A4:1 A4:1 | D5:1 D5:0.5 E5:0.5 D5:0.5 C5:0.5 | B4:1 G4:1 G4:1 | E5:1 E5:0.5 F5:0.5 E5:0.5 D5:0.5 | C5:1 A4:1 G4:0.5 G4:0.5 | A4:1 D5:1 B4:1 | C5:3',
+    lh:'C3:3 | F2:3 | D3:3 | G2:3 | E3:3 | F2:3 | G2:3 | C3:3', lhStart:1 },
+  { id:'silent', level:2, title:'Тиха нощ', composer:'Франц Грубер', bpm:80, bpb:3,
+    rh:'G4:1.5 A4:0.5 G4:1 | E4:3 | G4:1.5 A4:0.5 G4:1 | E4:3 | D5:2 D5:1 | B4:3 | C5:2 C5:1 | G4:3 | A4:2 A4:1 | C5:1.5 B4:0.5 A4:1 | G4:1.5 A4:0.5 G4:1 | E4:3 | A4:2 A4:1 | C5:1.5 B4:0.5 A4:1 | G4:1.5 A4:0.5 G4:1 | E4:3 | D5:2 D5:1 | F5:1.5 D5:0.5 B4:1 | C5:3 | E5:3 | C5:1.5 G4:0.5 E4:1 | G4:1.5 F4:0.5 D4:1 | C4:3',
+    lh:'C3:3 | C3:3 | C3:3 | C3:3 | G2:3 | G2:3 | C3:3 | C3:3 | F2:3 | F2:3 | C3:3 | C3:3 | F2:3 | F2:3 | C3:3 | C3:3 | G2:3 | G2:3 | C3:3 | C3:3 | C3:3 | G2:3 | C3:3' },
+
+  { id:'greensleeves', level:3, title:'Зелени ръкави', composer:'Народна, Англия', bpm:90, bpb:3, pickup:1,
+    rh:'A4:1 | C5:2 D5:1 | E5:1.5 F5:0.5 E5:1 | D5:2 B4:1 | G4:1.5 A4:0.5 B4:1 | C5:2 A4:1 | A4:1.5 G#4:0.5 A4:1 | B4:2 G#4:1 | E4:2 A4:1 | C5:2 D5:1 | E5:1.5 F5:0.5 E5:1 | D5:2 B4:1 | G4:1.5 A4:0.5 B4:1 | C5:1.5 B4:0.5 A4:1 | G#4:1.5 F#4:0.5 G#4:1 | A4:3 | G5:3 | G5:1.5 F#5:0.5 E5:1 | D5:2 B4:1 | G4:1.5 A4:0.5 B4:1 | C5:2 A4:1 | A4:1.5 G#4:0.5 A4:1 | B4:2 G#4:1 | E4:3 | G5:3 | G5:1.5 F#5:0.5 E5:1 | D5:2 B4:1 | G4:1.5 A4:0.5 B4:1 | C5:1.5 B4:0.5 A4:1 | G#4:1.5 F#4:0.5 G#4:1 | A4:3',
+    lh:'A2+E3:3 | C3+G3:3 | G2+D3:3 | E2+B2:3 | A2+E3:3 | E2+B2:3 | E2+B2:3 | A2+E3:3 | A2+E3:3 | C3+G3:3 | G2+D3:3 | E2+B2:3 | A2+E3:3 | E2+B2:3 | A2+E3:3 | C3+G3:3 | E2+B2:3 | G2+D3:3 | E2+B2:3 | A2+E3:3 | E2+B2:3 | E2+B2:3 | E2+B2:3 | C3+G3:3 | E2+B2:3 | G2+D3:3 | E2+B2:3 | A2+E3:3 | E2+B2:3 | A2+E3:3', lhStart:1 },
+  { id:'minuet', level:3, title:'Менует в Сол мажор', composer:'Кристиан Петцолд', bpm:90, bpb:3, key:['F#'],
+    rh:'D5:1 G4:0.5 A4:0.5 B4:0.5 C5:0.5 | D5:1 G4:1 G4:1 | E5:1 C5:0.5 D5:0.5 E5:0.5 F#5:0.5 | G5:1 G4:1 G4:1 | C5:1 D5:0.5 C5:0.5 B4:0.5 A4:0.5 | B4:1 C5:0.5 B4:0.5 A4:0.5 G4:0.5 | F#4:1 G4:0.5 A4:0.5 B4:0.5 G4:0.5 | A4:3 | D5:1 G4:0.5 A4:0.5 B4:0.5 C5:0.5 | D5:1 G4:1 G4:1 | E5:1 C5:0.5 D5:0.5 E5:0.5 F#5:0.5 | G5:1 G4:1 G4:1 | C5:1 D5:0.5 C5:0.5 B4:0.5 A4:0.5 | B4:1 C5:0.5 B4:0.5 A4:0.5 G4:0.5 | A4:1 B4:0.5 A4:0.5 G4:0.5 F#4:0.5 | G4:3',
+    lh:'G2+D3:3 | B2:3 | C3:3 | B2:3 | A2:3 | G2:3 | D3:3 | D3+F#3:3 | G2+D3:3 | B2:3 | C3:3 | B2:3 | A2:3 | G2:3 | D3:3 | G2+D3:3' },
+  { id:'canon', level:3, title:'Канон в Ре', composer:'Йохан Пахелбел', bpm:70, bpb:4, key:['F#','C#'],
+    rh:'F#5:2 E5:2 | D5:2 C#5:2 | B4:2 A4:2 | B4:2 C#5:2 | D5:2 C#5:2 | B4:2 A4:2 | G4:2 F#4:2 | G4:2 E4:2 | D4:1 F#4:1 A4:1 G4:1 | F#4:1 D4:1 F#4:1 E4:1 | D4:1 B3:1 D4:1 A4:1 | G4:1 B4:1 A4:1 G4:1 | F#4+A4+D5:4',
+    lh:'D3:2 A2:2 | B2:2 F#2:2 | G2:2 D2:2 | G2:2 A2:2 | D3:2 A2:2 | B2:2 F#2:2 | G2:2 D2:2 | G2:2 A2:2 | D3:2 A2:2 | B2:2 F#2:2 | G2:2 D2:2 | G2:2 A2:2 | D2+A2:4' },
+
+  { id:'elise', level:4, title:'За Елиза', composer:'Лудвиг ван Бетовен', bpm:60, bpb:1.5, ts:'3/8', tick:0.5, pickup:0.5, zoom:2,
+    rh:'E5:0.25 D#5:0.25 | E5:0.25 D#5:0.25 E5:0.25 B4:0.25 D5:0.25 C5:0.25 | A4:0.5 R:0.25 C4:0.25 E4:0.25 A4:0.25 | B4:0.5 R:0.25 E4:0.25 G#4:0.25 B4:0.25 | C5:0.5 R:0.25 E4:0.25 E5:0.25 D#5:0.25 | E5:0.25 D#5:0.25 E5:0.25 B4:0.25 D5:0.25 C5:0.25 | A4:0.5 R:0.25 C4:0.25 E4:0.25 A4:0.25 | B4:0.5 R:0.25 E4:0.25 C5:0.25 B4:0.25 | A4:1.5',
+    lh:'R:1.5 | A2:0.25 E3:0.25 A3:0.25 R:0.75 | E2:0.25 E3:0.25 G#3:0.25 R:0.75 | A2:0.25 E3:0.25 A3:0.25 R:0.75 | R:1.5 | A2:0.25 E3:0.25 A3:0.25 R:0.75 | E2:0.25 E3:0.25 G#3:0.25 R:0.75 | A2:0.25 E3:0.25 A3:0.25 R:0.75', lhStart:0.5 },
+  { id:'prelude', level:4, title:'Прелюд в До мажор', composer:'Йохан Себастиан Бах', bpm:56, bpb:4, zoom:1.7,
+    rh:PRELUDE.rh, lh:PRELUDE.lh },
+];
+
+function buildNotes(song) {
+  const notes = song.data
+    ? song.data.map(d => ({ ...midiInfo(d.midi, song.flats), beat: d.beat, dur: d.dur, hand: d.hand }))
+    : [...parsePart(song.rh, 'R', 0), ...(song.lh ? parsePart(song.lh, 'L', song.lhStart || 0) : [])];
+  notes.sort((a, b) => a.beat - b.beat || (a.hand === 'L' ? -1 : 1) || a.midi - b.midi);
+  notes.forEach((n, i) => { n.id = i; n.state = 'pending'; });
+  return notes;
+}
+// dev check: every "|"-separated bar must add up to bpb (the first may be a pickup)
+function validateSongs() {
+  const issues = [];
+  for (const s of SONGS.filter(x => x.rh)) for (const [hand, str, start] of [['R', s.rh, 0], ['L', s.lh, s.lhStart || 0]]) {
+    if (!str) continue;
+    try { parsePart(str, hand, 0); } catch (e) { issues.push(`${s.id}/${hand}: ${e.message}`); continue; }
+    str.split('|').forEach((bar, i) => {
+      const sum = bar.trim().split(/\s+/).filter(Boolean).reduce((a, t) => a + parseDur(t.slice(t.lastIndexOf(':') + 1)), 0);
+      const pickupBar = i === 0 && hand === 'R' && s.pickup;
+      const want = pickupBar ? s.pickup : s.bpb;
+      if (Math.abs(sum - want) > 1e-6) issues.push(`${s.id}/${hand} такт ${i + 1}: ${sum} вместо ${want}`);
+    });
+    if (hand === 'L' && Math.abs((start || 0) - (s.pickup || 0)) > 1e-6) issues.push(`${s.id}: lhStart ≠ pickup`);
+  }
+  return issues;
+}
+
+/* ============================================================
+   Audio: context, sampled piano (Salamander Grand, CC-BY), metronome
+   ============================================================ */
+let actx = null, masterGain = null;
+function audio() {
+  if (!actx) {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = actx.createGain(); masterGain.gain.value = 0.9; masterGain.connect(actx.destination);
+  }
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+const SAMPLE_BASE = 'https://tonejs.github.io/audio/salamander/';
+const SAMPLES = [];
+for (let o = 1; o <= 7; o++) for (const [n, pc] of [['C', 0], ['Ds', 3], ['Fs', 6], ['A', 9]]) SAMPLES.push({ name: n + o, midi: (o + 1) * 12 + pc });
+const piano = { buffers: new Map(), keys: [], loading: null, ready: false };
+function loadPiano() {
+  if (piano.loading) return piano.loading;
+  const c = audio();
+  piano.loading = Promise.all(SAMPLES.map(async s => {
+    try {
+      const r = await fetch(SAMPLE_BASE + s.name + '.mp3');
+      if (!r.ok) return;
+      piano.buffers.set(s.midi, await c.decodeAudioData(await r.arrayBuffer()));
+    } catch (e) { /* fall back to the synth for this range */ }
+  })).then(() => {
+    piano.keys = [...piano.buffers.keys()].sort((a, b) => a - b);
+    piano.ready = piano.keys.length >= 10;
+  });
+  return piano.loading;
+}
+function playNote(m, dur = 0.6, when = 0, vel = 0.8, ctx = null, dest = null, detune = 0) {
+  ctx = ctx || audio(); dest = dest || (ctx === actx ? masterGain : ctx.destination);
+  const t = Math.max(when, ctx.currentTime);
+  const rel = t + Math.max(0.25, dur);
+  if (piano.ready) {
+    let s = piano.keys[0];
+    for (const k of piano.keys) if (Math.abs(k - m) < Math.abs(s - m)) s = k;
+    const src = ctx.createBufferSource();
+    src.buffer = piano.buffers.get(s);
+    src.playbackRate.value = 2 ** ((m - s) / 12 + detune / 1200);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(vel, t); g.gain.setValueAtTime(vel, rel);
+    g.gain.exponentialRampToValueAtTime(0.001, rel + 0.5);
+    src.connect(g).connect(dest); src.start(t); src.stop(rel + 0.6);
+    return;
+  }
+  const f = 440 * 2 ** ((m - 69) / 12);
+  const g = ctx.createGain(), lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.setValueAtTime(Math.min(9000, f * 8), t); lp.frequency.exponentialRampToValueAtTime(Math.max(400, f * 2), t + 1);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel * 0.3, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(vel * 0.1, t + 0.35); g.gain.setValueAtTime(vel * 0.1, rel);
+  g.gain.exponentialRampToValueAtTime(0.0005, rel + 0.5);
+  const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g2 = ctx.createGain();
+  o1.type = 'triangle'; o1.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = 0.35;
+  o1.connect(lp); o2.connect(g2).connect(lp); lp.connect(g).connect(dest);
+  o1.start(t); o2.start(t); o1.stop(rel + 0.6); o2.stop(rel + 0.6);
+}
+function click(accent) {
+  const c = audio(), t = c.currentTime;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = 'square'; o.frequency.value = accent ? 1760 : 1175;
+  g.gain.setValueAtTime(accent ? 0.12 : 0.07, t); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.04);
+  o.connect(g).connect(masterGain); o.start(t); o.stop(t + 0.05);
+}
+
+/* ============================================================
+   Polyphonic note detector (microphone).
+   On every energy onset it compares the spectrum just before the
+   attack with the spectrum ~100ms after it. Only what was newly struck
+   remains (ringing notes decay, so they cancel out). Pitches are then
+   picked one by one by harmonic summation, and each picked note's
+   harmonics are subtracted (spectral smoothness keeps octaves alive).
+   ============================================================ */
+function makeFFT(N) {
+  const lev = Math.log2(N), rev = new Uint32Array(N);
+  for (let i = 0; i < N; i++) { let r = 0, x = i; for (let b = 0; b < lev; b++) { r = (r << 1) | (x & 1); x >>= 1; } rev[i] = r; }
+  const cs = new Float32Array(N / 2), sn = new Float32Array(N / 2);
+  for (let i = 0; i < N / 2; i++) { cs[i] = Math.cos(2 * Math.PI * i / N); sn[i] = -Math.sin(2 * Math.PI * i / N); }
+  return (re, im) => {
+    for (let i = 0; i < N; i++) { const j = rev[i]; if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+    for (let size = 2; size <= N; size <<= 1) {
+      const half = size >> 1, step = N / size;
+      for (let i = 0; i < N; i += size) for (let j = 0, k = 0; j < half; j++, k += step) {
+        const l = i + j + half;
+        const tr = re[l] * cs[k] - im[l] * sn[k], ti = re[l] * sn[k] + im[l] * cs[k];
+        re[l] = re[i + j] - tr; im[l] = im[i + j] - ti; re[i + j] += tr; im[i + j] += ti;
+      }
+    }
+  };
+}
+class PolyDetector {
+  constructor(sr) {
+    const N = this.N = 8192;
+    this.sr = sr; this.fft = makeFFT(N);
+    this.re = new Float32Array(N); this.im = new Float32Array(N);
+    this.hann = new Float32Array(N);
+    for (let i = 0; i < N; i++) this.hann[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1));
+    this.binHz = sr / N; this.maxBin = Math.min(N / 2 - 3, Math.ceil(5200 / this.binHz));
+    this.specs = []; this.eHist = []; this.noiseE = null; this.lastOnset = -1; this.pending = []; this.held = null;
+    this.lastEmit = new Map(); this.level = 0; this.sens = 1; this.expected = null;
+    this.tune = 0; this.cal = null; this.probeMode = false;
+    // evaluate once the analysis window holds mostly audio from after the strike; it starts ~50ms
+    // before the onset so the attack itself is inside it too
+    this.evalDelay = N / sr - 0.05;
+    this.buildCands();
+  }
+  // harmonic search windows for every piano key, shifted by the piano's measured tuning
+  buildCands() {
+    this.cands = [];
+    for (let m = 36; m <= 96; m++) {
+      const f0 = 440 * 2 ** ((m - 69) / 12 + this.tune / 1200), harm = [];
+      for (let h = 1; h <= 10; h++) {
+        const f = h * f0 * Math.sqrt(1 + 0.0003 * h * h);
+        if (f > 5000) break;
+        const c = f / this.binHz, r = Math.round(c);
+        const lo = Math.max(1, Math.min(r - 1, Math.floor(c * 2 ** (-40 / 1200))));
+        const hi = Math.min(this.maxBin, Math.max(r + 1, Math.ceil(c * 2 ** (40 / 1200))));
+        harm.push({ lo, hi, w: (f0 + 27) / (h * f0 + 320) });
+      }
+      this.cands.push({ m, f0, harm });
+    }
+  }
+  applyCal(cal) {
+    this.cal = cal; this.tune = cal ? cal.tune : 0; this.buildCands();
+    if (cal && this.noiseE === null) this.noiseE = cal.noiseE;
+  }
+  // background level of the spectrum around every bin (median of its neighbourhood), never below
+  // the room's own noise spectrum measured during setup
+  floorOf(mag) {
+    const n = mag.length, out = new Float32Array(n), tmp = [];
+    for (let k = 0; k < n; k++) {
+      tmp.length = 0;
+      for (let j = Math.max(0, k - 10); j <= Math.min(n - 1, k + 10); j++) tmp.push(mag[j]);
+      tmp.sort((x, y) => x - y);
+      out[k] = Math.max(tmp[tmp.length >> 1], this.cal && this.cal.noiseSpec ? this.cal.noiseSpec[k] * 1.5 : 0);
+    }
+    return out;
+  }
+  // A played note shows up as sharp, newly appeared peaks on its harmonics. Noise (fans,
+  // typing, footsteps) spreads energy over all frequencies and never makes such peaks.
+  // `loose` is for notes the song is waiting for right now.
+  tonal(c, mag, D0, floor, loose) {
+    let cnt = 0, low = 0;
+    const peak = loose ? 4 : 6, fresh = loose ? 0.2 : 0.3;
+    for (let i = 0; i < Math.min(6, c.harm.length); i++) {
+      const h = c.harm[i]; let mx = 0, p = h.lo;
+      for (let k = h.lo; k <= h.hi; k++) if (mag[k] > mx) { mx = mag[k]; p = k; }
+      if (mx > peak * floor[p] && D0[p] > fresh * mx) { cnt++; if (i < 2) low++; }
+    }
+    return cnt >= 2 && low >= 1;
+  }
+  // how far (in cents) the struck string sits from equal temperament at A=440
+  centsOf(c, mag, floor) {
+    const ests = [];
+    for (let i = 0; i < Math.min(4, c.harm.length); i++) {
+      const h = c.harm[i]; let mx = 0, p = h.lo;
+      for (let k = h.lo; k <= h.hi; k++) if (mag[k] > mx) { mx = mag[k]; p = k; }
+      if (mx <= 6 * floor[p] || p < 1) continue;
+      const y0 = mag[p - 1], y1 = mag[p], y2 = mag[p + 1], den = y0 - 2 * y1 + y2;
+      const f = (p + (den ? 0.5 * (y0 - y2) / den : 0)) * this.binHz, hh = i + 1;
+      ests.push(1200 * Math.log2(f / (hh * Math.sqrt(1 + 0.0003 * hh * hh)) / (440 * 2 ** ((c.m - 69) / 12))));
+    }
+    ests.sort((x, y) => x - y);
+    return ests.length ? ests[ests.length >> 1] : null;
+  }
+  // buf: the latest N samples; t: time (s) of the last sample
+  process(buf, t) {
+    const N = this.N, off = buf.length - N;
+    // broadband energy, plus "brightness" (first difference) which jumps on every hammer strike
+    // even while louder notes are still ringing
+    let e = 0, hf = 0;
+    for (let i = buf.length - 1024; i < buf.length; i++) { e += buf[i] * buf[i]; const d = buf[i] - buf[i - 1]; hf += d * d; }
+    e /= 1024; hf /= 1024; this.level = e;
+    const re = this.re, im = this.im, w = this.hann;
+    for (let i = 0; i < N; i++) { re[i] = buf[off + i] * w[i]; im[i] = 0; }
+    this.fft(re, im);
+    const mag = new Float32Array(this.maxBin + 3);
+    for (let k = 0; k < mag.length; k++) mag[k] = Math.hypot(re[k], im[k]);
+    this.specs.push(mag); if (this.specs.length > 6) this.specs.shift();
+
+    // compare against the quietest recent frame, but only frames after the previous onset:
+    // otherwise the pre-attack silence makes the rest of the attack look like a new strike
+    const hist = this.eHist, last = hist.length ? hist[hist.length - 1] : { e, hf, t };
+    let minE = Infinity, minHf = Infinity;
+    for (let i = Math.max(0, hist.length - 6); i < hist.length; i++) if (hist[i].t > this.lastOnset) { minE = Math.min(minE, hist[i].e); minHf = Math.min(minHf, hist[i].hf); }
+    if (minE === Infinity) { minE = e; minHf = hf; }
+    hist.push({ e, hf, t }); if (hist.length > 12) hist.shift();
+    // noise floor: follows quiet moments quickly, creeps up very slowly while music plays
+    if (this.noiseE === null) this.noiseE = e;
+    else if (e < this.noiseE) this.noiseE = this.noiseE * 0.9 + e * 0.1;
+    else this.noiseE *= 1.0005;
+
+    const floor = Math.max(this.noiseE, 1e-9);
+    const rising = (e > minE * 1.3 && e > last.e * 1.04) || (hf > minHf * 2 && hf > last.hf * 1.15 && e > minE * 1.08);
+    // a low bar is fine: every onset still has to pass the harmonic-peak check
+    const gate = Math.max(floor * 4, this.cal ? this.cal.gateE : 0) / this.sens;
+    if (e > gate && rising && t - this.lastOnset > 0.06) {
+      this.lastOnset = t; this.onsets = (this.onsets || 0) + 1;
+      const pre = this.specs.length >= 3 ? this.specs[this.specs.length - 3] : new Float32Array(mag.length);
+      this.pending.push({ t0: t, pre, e });
+    }
+    const events = [];
+    // A struck string keeps exactly its pitch; a voice (or TV) glides. Look again 50ms later
+    // and only accept notes whose harmonics are still there at the same pitch.
+    let floorNow = null;
+    this.verify = (this.verify || []).filter(v => {
+      if (t < v.due) return true;
+      if (v.ev.cents !== null && !this.probeMode) {
+        floorNow = floorNow || this.floorOf(mag);
+        const c1 = this.centsOf(this.cands[v.ev.midi - 36], mag, floorNow);
+        if (c1 === null || Math.abs(c1 - v.ev.cents) > 20) return false;
+      }
+      const last = this.lastEmit.get(v.ev.midi);
+      if (last !== undefined && v.ev.t - last < 0.2) return false; // same strike seen by two overlapping onsets
+      this.lastEmit.set(v.ev.midi, v.ev.t); events.push(v.ev);
+      return false;
+    });
+    const emit = evs => { for (const ev of evs) this.verify.push({ ev, due: t + (this.probeMode ? 0 : 0.05) }); };
+    while (this.pending.length && t - this.pending[0].t0 >= this.evalDelay) {
+      const o = this.pending.shift(), evs = this.analyze(o, mag);
+      // An onset's window also contains the start of any strike that follows within it. Hold
+      // its notes until that next onset is analysed; notes it also finds belong to it.
+      // A note found by both goes to the onset where it is freshest (the real strike).
+      if (this.held) {
+        const h = this.held;
+        emit(h.filter(a => !evs.some(b => b.midi === a.midi && b.fresh >= a.fresh)));
+        for (let i = evs.length - 1; i >= 0; i--) if (h.some(a => a.midi === evs[i].midi && a.fresh > evs[i].fresh)) evs.splice(i, 1);
+        this.held = null;
+      }
+      if (this.pending.length && this.pending[0].t0 < o.t0 + this.evalDelay) this.held = evs;
+      else emit(evs);
+    }
+    return events;
+  }
+  sal(c, s) {
+    let v = 0;
+    for (const h of c.harm) { let mx = 0; for (let k = h.lo; k <= h.hi; k++) if (s[k] > mx) mx = s[k]; v += h.w * mx; }
+    return v;
+  }
+  subtract(c, s) {
+    const amps = c.harm.map(h => { let mx = 0, p = h.lo; for (let k = h.lo; k <= h.hi; k++) if (s[k] > mx) { mx = s[k]; p = k; } return { a: mx, p }; });
+    amps.forEach(({ a, p }, i) => {
+      if (a <= 0) return;
+      let sum = a, n = 1;
+      if (i > 0) { sum += amps[i - 1].a; n++; }
+      if (i < amps.length - 1) { sum += amps[i + 1].a; n++; }
+      const f = 1 - Math.min(a, sum / n) / a;
+      for (let k = Math.max(0, p - 2); k <= Math.min(s.length - 1, p + 2); k++) s[k] *= f;
+    });
+  }
+  analyze(o, mag) {
+    const D = new Float32Array(mag.length);
+    for (let k = 0; k < D.length; k++) D[k] = Math.max(0, mag[k] - o.pre[k]);
+    const D0 = D.slice(), floor = this.floorOf(mag);
+    if (this.probeMode) return this.probe(o, mag, D0, floor);
+    const noiseSal = Math.sqrt(this.noiseE * 0.375 * this.N);
+    const absThr = Math.max(0.5, noiseSal * 6, this.cal ? this.cal.absThr : 0) / this.sens;
+    const exp = this.expected ? this.expected(o.t0) : null;
+    const found = []; let first = 0;
+    for (let it = 0; it < 6; it++) {
+      let best = null, bs = 0, braw = 0;
+      for (const c of this.cands) {
+        const v = this.sal(c, D), sc = v * (exp && exp.has(c.m) ? 1.25 : 1);
+        if (sc > bs) { bs = sc; best = c; braw = v; }
+      }
+      if (!best) break;
+      if (it === 0) first = braw;
+      const isExp = !!(exp && exp.has(best.m));
+      if (braw < absThr || braw < first * (isExp ? 0.12 : 0.3)) break;
+      if (!found.some(f => f.m === best.m)) found.push({ m: best.m, s: braw, exp: isExp });
+      this.subtract(best, D);
+    }
+    // an unexpected note sitting on a harmonic of a stronger found note is almost always a ghost
+    const HARM = [12, 19, 24, 28, 31];
+    // A real strike makes up a big part of what the note sounds like right now; the slow swell
+    // of a still-ringing string (beating between its strings) is only a small part of it
+    for (const f of found) { const c = this.cands[f.m - 36]; f.fresh = this.sal(c, D0) / Math.max(1e-9, this.sal(c, mag)); }
+    const kept = found.filter(f => f.fresh >= (f.exp ? 0.3 : 0.4)
+      && this.tonal(this.cands[f.m - 36], mag, D0, floor, f.exp)
+      && (f.exp || !found.some(g => g !== f && g.s > f.s && HARM.includes(f.m - g.m))));
+    return kept.map(f => ({ midi: f.m, t: o.t0, strength: f.s / absThr, fresh: f.fresh, cents: this.centsOf(this.cands[f.m - 36], mag, floor) }));
+  }
+  // setup: the single clearest new note, with its loudness and tuning
+  probe(o, mag, D0, floor) {
+    let best = null, bs = 0;
+    for (const c of this.cands) {
+      if (!this.tonal(c, mag, D0, floor)) continue;
+      const v = this.sal(c, D0);
+      if (v > bs) { bs = v; best = c; }
+    }
+    if (!best || (this.cal && bs < this.cal.absThr)) return [];
+    return [{ midi: best.m, t: o.t0, s: bs, e: o.e, cents: this.centsOf(best, mag, floor) }];
+  }
+}
+
+/* ============================================================
+   Setup ("Настройка"), started by the user: play the C major scale
+   from middle C up to the next C. The moment before the first note
+   gives the room noise; the eight notes give how loud this piano is
+   through this microphone and how far it is from A=440.
+   ============================================================ */
+const CAL_NOTES = [60, 62, 64, 65, 67, 69, 71, 72];
+const quantile = (arr, p) => { const a = [...arr].sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.floor(p * a.length))]; };
+class Calibrator {
+  constructor(det) {
+    this.det = det; this.phase = 'notes'; this.t0 = null; this.lastT = null;
+    this.es = []; this.frames = []; this.noise = null;
+    this.idx = 0; this.hits = []; this.tries = 0; this.lastHeard = null; this.flashes = []; this.heardUntil = 0;
+    det.applyCal(null); det.probeMode = true; det.onsets = 0;
+  }
+  get target() { return CAL_NOTES[this.idx]; }
+  feed(buf, t) {
+    if (this.t0 === null) { this.t0 = t; this.lastT = t; }
+    const evs = this.det.process(buf, t);
+    if (!this.noise) {
+      // until the first strike (at most 2 s) the room is quiet: that is its noise
+      if (this.det.onsets > 0 || t - this.t0 > 2) this.finishNoise();
+      else if (t - this.t0 > 0.2) { this.es.push(this.det.level); this.frames.push(this.det.specs[this.det.specs.length - 1]); }
+    }
+    for (const ev of evs) {
+      this.lastT = t;
+      const ok = (ev.midi - this.target) % 12 === 0;
+      this.flashes.push({ midi: ev.midi, ok }); this.heardUntil = performance.now() + 700;
+      // octave slips don't matter here: loudness and tuning are what we learn
+      if (ok) {
+        this.hits.push(ev); this.lastHeard = { midi: ev.midi, ok: true };
+        this.idx++; this.tries = 0;
+        if (this.idx >= CAL_NOTES.length) { this.finish(); return; }
+      } else { this.lastHeard = { midi: ev.midi, ok: false }; this.tries++; }
+    }
+  }
+  skip() { this.idx++; this.tries = 0; this.lastHeard = null; if (this.idx >= CAL_NOTES.length) this.finish(); }
+  finishNoise() {
+    const frames = this.frames.slice(0, -3); // the last frames may already hold the first strike
+    const es = this.es.slice(0, -3);
+    if (frames.length < 8) { this.noise = { noiseE: this.det.noiseE, noiseE95: this.det.noiseE * 2, noiseSpec: null, noiseSal: 0 }; return; }
+    const n = frames[0].length, noiseSpec = new Float32Array(n), col = [];
+    for (let k = 0; k < n; k++) { col.length = 0; for (const f of frames) col.push(f[k]); noiseSpec[k] = quantile(col, 0.75); }
+    // what a plain noise fluctuation looks like to the note picker
+    const sals = [];
+    for (let i = 3; i < frames.length; i++) {
+      const D = frames[i].map((v, k) => Math.max(0, v - frames[i - 3][k]));
+      let mx = 0; for (const c of this.det.cands) mx = Math.max(mx, this.det.sal(c, D));
+      sals.push(mx);
+    }
+    this.noise = { noiseE: quantile(es, 0.5), noiseE95: quantile(es, 0.95), noiseSpec, noiseSal: quantile(sals, 0.99) };
+  }
+  finish() {
+    if (!this.noise) this.finishNoise();
+    this.det.probeMode = false;
+    const med = a => a.length ? quantile(a, 0.5) : 0;
+    const cents = this.hits.map(h => h.cents).filter(c => c !== null && Math.abs(c) < 60);
+    const n = this.noise, es = this.hits.map(h => h.e), ss = this.hits.map(h => h.s);
+    this.cal = {
+      tune: cents.length ? Math.round(med(cents)) : 0,
+      noiseE: n.noiseE, noiseSpec: n.noiseSpec,
+      gateE: Math.max(n.noiseE95 * 2.5, es.length ? Math.min(...es) * 0.02 : 0),
+      absThr: Math.max(n.noiseSal * 2.5, ss.length ? med(ss) * 0.06 : 0),
+      snrDb: es.length ? Math.round(10 * Math.log10(med(es) / Math.max(1e-12, n.noiseE))) : null,
+      heard: this.hits.length, at: Date.now(),
+    };
+    this.det.applyCal(this.cal);
+    this.phase = 'done';
+  }
+}
+
+/* ============================================================
+   Game state
+   ============================================================ */
+const S = {
+  song: null, notes: [], endBeat: 0, beat: 0, bpm: 90,
+  hands: 'R', mode: 'wait', playing: false, demo: false, finished: false, waiting: false,
+  stats: { hit: 0, miss: 0, wrong: 0, offsets: [] }, streak: 0,
+  feedback: [], ghosts: [], flash: new Map(), accompRecent: [],
+  kbLo: 48, kbHi: 84, lastTs: 0,
+};
+const HIT_WIN = 0.2; // seconds either side in "В темп"
+const isActive = n => S.hands === 'both' || n.hand === S.hands;
+const bps = () => S.bpm / 60;
+const nowSec = () => performance.now() / 1000;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('piano.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('piano.' + k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
+};
+
+function nextGroupBeat() {
+  for (const n of S.notes) if (n.state === 'pending' && isActive(n)) return n.beat;
+  return null;
+}
+function currentTargets() {
+  if (!S.playing || S.demo) return [];
+  if (S.mode === 'wait') {
+    const g = nextGroupBeat();
+    return g === null ? [] : S.notes.filter(n => n.state === 'pending' && isActive(n) && Math.abs(n.beat - g) < 1e-6);
+  }
+  const win = HIT_WIN * bps();
+  return S.notes.filter(n => n.state === 'pending' && isActive(n) && n.beat >= S.beat - win && n.beat <= S.beat + 0.35);
+}
+
+let userSongs = store.get('userSongs', []);
+const allSongs = () => [...SONGS, ...userSongs];
+function loadSong(id) {
+  const song = allSongs().find(s => s.id === id) || SONGS[0];
+  S.song = song; S.bpm = song.bpm;
+  S.notes = buildNotes(song);
+  S.endBeat = Math.max(...S.notes.map(n => n.beat + n.dur));
+  const ms = S.notes.map(n => n.midi);
+  S.songLo = Math.min(...ms); S.songHi = Math.max(...ms);
+  S.kbLo = Math.min(48, Math.floor(Math.min(...ms) / 12) * 12);
+  S.kbHi = Math.max(83, Math.floor(Math.max(...ms) / 12) * 12 + 11);
+  S.song.hasLH = song.data ? song.data.some(d => d.hand === 'L') : !!song.lh;
+  if (!S.song.hasLH && S.hands !== 'R') S.hands = 'R';
+  $('#tempo').value = S.bpm; $('#tempoVal').textContent = S.bpm;
+  $('#songTitle').textContent = song.title;
+  $('#songMeta').textContent = `${'★'.repeat(song.level)} · ${song.composer}`;
+  store.set('song', song.id);
+  syncSegs(); reset(); resize();
+}
+function startBeat() {
+  if (S.mode === 'realtime' || S.demo) {
+    const countIn = S.song.bpb >= 2 ? S.song.bpb : S.song.bpb * 2;
+    return -countIn - 0.02;
+  }
+  return -1.5;
+}
+function reset() {
+  S.playing = false; S.demo = false; S.finished = false; S.waiting = false;
+  for (const n of S.notes) n.state = 'pending';
+  S.stats = { hit: 0, miss: 0, wrong: 0, offsets: [] }; S.streak = 0;
+  S.feedback = []; S.ghosts = [];
+  S.beat = startBeat();
+  updateStats(); updateButtons(); showOverlay('start'); updatePrompt();
+}
+async function play() {
+  audio(); loadPiano();
+  if (!mic.active) { await toggleMic(); if (!mic.active) return; }
+  if (S.finished) reset();
+  S.playing = true; S.lastTs = 0;
+  showOverlay(null); updateButtons();
+}
+function pause() { S.playing = false; showOverlay('pause'); updateButtons(); updatePrompt(); }
+function startDemo() {
+  audio(); loadPiano();
+  reset(); S.demo = true; S.beat = startBeat(); S.playing = true; S.lastTs = 0;
+  showOverlay(null); updateButtons(); updatePrompt();
+}
+function finish() {
+  S.playing = false;
+  if (S.demo) { reset(); return; }
+  S.finished = true;
+  const acc = accuracy();
+  const key = `${S.song.id}|${S.hands}|${S.mode}`, bests = store.get('bests', {});
+  const isBest = acc !== null && (bests[key] === undefined || acc > bests[key]);
+  if (isBest) { bests[key] = acc; store.set('bests', bests); }
+  showOverlay('results', { acc, isBest });
+  updateButtons(); updatePrompt();
+}
+function accuracy() {
+  const { hit, miss, wrong } = S.stats;
+  const total = S.mode === 'wait' ? hit + wrong : hit + miss + Math.round(wrong / 2);
+  return total ? Math.round(100 * hit / total) : null;
+}
+
+function update(dt) {
+  const prev = S.beat;
+  let nb = prev + dt * bps();
+  S.waiting = false;
+  if (S.mode === 'wait' && !S.demo) {
+    const g = nextGroupBeat();
+    if (g !== null && nb >= g) { nb = g; S.waiting = true; }
+  }
+  // metronome (always during the count-in)
+  const tick = S.song.tick || 1, pk = S.song.pickup || 0;
+  if (S.mode === 'realtime' || S.demo) {
+    const k0 = Math.floor(prev / tick + 1e-9), k1 = Math.floor(nb / tick + 1e-9);
+    for (let k = k0 + 1; k <= k1; k++) {
+      const b = k * tick;
+      if (b < 0 || $('#optMetro').checked) {
+        const barPos = (b - pk) / S.song.bpb;
+        click(b < 0 ? Math.abs(b + (S.song.bpb >= 2 ? S.song.bpb : S.song.bpb * 2)) < 1e-6 : Math.abs(barPos - Math.round(barPos)) < 1e-6);
+      }
+    }
+  }
+  // notes the computer plays: everything in the demo, the other hand as accompaniment
+  const accomp = $('#optAccomp').checked;
+  for (const n of S.notes) {
+    if (n.beat < prev || n.beat >= nb) continue;
+    if (S.demo) { playNote(n.midi, n.dur / bps(), 0, n.hand === 'L' ? 0.55 : 0.8); n.state = 'played'; }
+    else if (!isActive(n) && accomp) { playNote(n.midi, n.dur / bps(), 0, 0.5); S.accompRecent.push({ m: n.midi, t: nowSec() }); }
+  }
+  // misses in real-time mode (mic detection lags, so give it a little extra)
+  if (S.mode === 'realtime' && !S.demo) {
+    const lateBeats = (HIT_WIN + (mic.active ? 0.2 : 0)) * bps();
+    for (const n of S.notes) if (n.state === 'pending' && isActive(n) && nb > n.beat + lateBeats) {
+      n.state = 'miss'; S.stats.miss++; S.streak = 0; updateStats();
+    }
+  }
+  S.beat = nb;
+  if (S.beat > S.endBeat + 0.6 && (S.demo || nextGroupBeat() === null)) finish();
+}
+
+// One strike on the piano can produce several detected notes (a chord). If any of them is
+// a note we were waiting for, the extras are treated as detector noise; if none is, the
+// strike counts as a single wrong note.
+function onStrike(midis, tEvent) {
+  const now = performance.now();
+  if (!S.playing || S.demo) { for (const m of midis) S.flash.set(m, { kind: 'neutral', until: now + 700 }); return; }
+  const hits = midis.filter(m => tryHit(m, tEvent));
+  // far outside the song's range it is noise (a door, a voice, a string's overtone), not a wrong key
+  const plausible = midis.filter(m => m >= S.songLo - 5 && m <= S.songHi + 5);
+  if (!hits.length && plausible.length) wrongNote(plausible[0]);
+  updateStats(); updatePrompt();
+}
+function tryHit(midi, tEvent) {
+  const now = performance.now();
+  const lenient = $('#optOctave').checked;
+  const exact = n => n.midi === midi, loose = n => lenient && (n.midi - midi) % 12 === 0;
+  let cand = null, offSec = 0;
+  if (S.mode === 'realtime') {
+    const lag = nowSec() - tEvent + 0.03; // detection happens ~170ms after the strike
+    const beatAt = S.beat - lag * bps(), win = HIT_WIN * bps();
+    const near = S.notes.filter(n => n.state === 'pending' && isActive(n) && Math.abs(n.beat - beatAt) <= win);
+    const pick = f => near.filter(f).sort((a, b) => Math.abs(a.beat - beatAt) - Math.abs(b.beat - beatAt))[0];
+    cand = pick(exact) || pick(loose) || null;
+    if (cand) offSec = (beatAt - cand.beat) / bps();
+  } else {
+    const g = nextGroupBeat();
+    if (g !== null && g - S.beat <= 1) {
+      const grp = S.notes.filter(n => n.state === 'pending' && isActive(n) && Math.abs(n.beat - g) < 1e-6);
+      cand = grp.find(exact) || grp.find(loose) || null;
+    }
+  }
+  if (cand) {
+    cand.state = 'hit'; S.stats.hit++; S.streak++;
+    if (lenient) for (const n of S.notes) // hands in octaves: the mic cannot tell them apart
+      if (n !== cand && n.state === 'pending' && isActive(n) && Math.abs(n.beat - cand.beat) < 1e-6 && (n.midi - midi) % 12 === 0) { n.state = 'hit'; S.stats.hit++; }
+    S.flash.set(midi, { kind: 'good', until: now + 700 });
+    let text = S.streak >= 5 && S.streak % 5 === 0 ? `Серия ${S.streak}!` : '✓';
+    if (S.mode === 'realtime') {
+      S.stats.offsets.push(offSec);
+      const a = Math.abs(offSec);
+      text = a < 0.07 ? 'Перфектно!' : a < 0.14 ? 'Добре' : offSec < 0 ? 'Рано' : 'Късно';
+    }
+    S.feedback.push({ text, color: '#17a34a', t: now });
+    return true;
+  }
+  return false;
+}
+function wrongNote(midi) {
+  const now = performance.now();
+  S.stats.wrong++; S.streak = 0;
+  S.flash.set(midi, { kind: 'bad', until: now + 700 });
+  S.ghosts.push({ midi, t: now });
+  S.feedback.push({ text: midiName(midi) + '?', color: '#dc3545', t: now });
+}
+
+/* ============================================================
+   Input: microphone
+   ============================================================ */
+window.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.code === 'Space') { e.preventDefault(); if (!$('#lib').hidden || calib.c) return; togglePlay(); }
+  else if (e.code === 'Escape') $('#lib').hidden = true;
+});
+
+const mic = { active: false, stream: null, analyser: null, buf: null, det: null, heard: [] };
+async function toggleMic() {
+  if (mic.active) {
+    mic.stream.getTracks().forEach(t => t.stop());
+    mic.active = false; $('#btnMic').classList.remove('on'); $('#btnMic').textContent = '🎤 Включи микрофона'; $('#micBox').hidden = true;
+    setStatus('Микрофонът е изключен.');
+    return;
+  }
+  try {
+    const c = audio(); loadPiano();
+    mic.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    const src = c.createMediaStreamSource(mic.stream);
+    mic.analyser = c.createAnalyser(); mic.analyser.fftSize = 8192; mic.analyser.smoothingTimeConstant = 0;
+    src.connect(mic.analyser);
+    mic.buf = new Float32Array(8192);
+    mic.det = new PolyDetector(c.sampleRate);
+    mic.det.expected = t0 => expectedForDetector(t0);
+    mic.det.applyCal(loadCal(c.sampleRate));
+    applySens();
+    mic.active = true; $('#btnMic').classList.add('on'); $('#btnMic').textContent = '🎤 Изключи'; $('#micBox').hidden = false;
+    setStatus('🎤 Слушам. Засвири някоя нота, за да провериш дали те чувам.');
+  } catch (err) { setStatus('Нямам достъп до микрофона: ' + err.message); }
+}
+function loadCal(sr) {
+  const saved = store.get('cal', null);
+  if (!saved || saved.sr !== sr) return null;
+  return { ...saved, noiseSpec: saved.noiseSpec ? Float32Array.from(saved.noiseSpec) : null };
+}
+function updateCalButton() {
+  const saved = store.get('cal', null);
+  $('#btnCal').textContent = saved ? '🎚 Настройка ✓' : '🎚 Настройка';
+  $('#btnCal').classList.toggle('on', !!saved);
+  $('#btnCal').title = saved ? 'Има запазена настройка от ' + new Date(saved.at).toLocaleString('bg-BG') + '. Натисни, за да я направиш отново.' : 'Настрой слушането за твоето пиано и стая';
+}
+const dB = e => Math.round(10 * Math.log10(Math.max(e, 1e-12)));
+function updateDiag() {
+  const d = mic.det, cal = d.cal;
+  $('#diag').textContent = cal
+    ? `звук ${dB(d.level)} dB · шум ${dB(d.noiseE)} dB${cal.tune ? ` · пианото е ${cal.tune > 0 ? '+' : ''}${cal.tune} цента` : ''}`
+    : `звук ${dB(d.level)} dB · шум ${dB(d.noiseE)} dB`;
+}
+
+const calib = { c: null, html: '' };
+async function startCalibration() {
+  if (!mic.active) { await toggleMic(); if (!mic.active) return; }
+  if (S.playing) { S.playing = false; updateButtons(); }
+  S.kbLo = Math.min(S.kbLo, 48); S.kbHi = Math.max(S.kbHi, 71);
+  calib.c = new Calibrator(mic.det); calib.html = '';
+  renderCalib();
+}
+function renderCalib() {
+  const c = calib.c; if (!c) return;
+  const now = nowSec();
+  let body;
+  if (c.phase === 'notes') {
+    // the eight white keys from middle C, numbered in the order to play them
+    const heard = c.lastHeard && performance.now() < c.heardUntil ? c.lastHeard : null;
+    const hc = m => heard && heard.midi === m ? (heard.ok ? ' hg' : ' hb') : '';
+    const whites = CAL_NOTES.map((m, i) => `<div class="w ${i < c.idx ? 'done' : i === c.idx ? 'cur' : ''}${hc(m)}"><span class="n">${i < c.idx ? '✓' : i + 1}</span>${midiName(m)}</div>`).join('');
+    const blacks = [[1, 61], [2, 63], [4, 66], [5, 68], [6, 70]].map(([i, m]) => `<div class="b${hc(m)}" style="left:calc(var(--kw) * ${i} - var(--bw) / 2)"></div>`).join('');
+    const keys = `<div class="mini">${whites}${blacks}</div><p class="mini-hint">Отляво надясно: 1 → 8 · сега: <b>${c.idx + 1}. ${midiName(c.target, true)}</b></p>`
+      + (c.idx === 0 ? '<p class="mini-hint">Средното До е в средата на пианото, обикновено точно под името му: белият клавиш веднага вляво от двата черни.</p>' : '');
+    const heardMsg = c.lastHeard
+      ? (c.lastHeard.ok ? '<p class="ok">✓ Чух го!</p>' : `<p class="no">Чух ${midiName(c.lastHeard.midi)}. Сега ${midiName(c.target)}.</p>`)
+      : (now - c.lastT > 7 ? '<p class="no">Не чувам нищо. Приближи устройството до пианото или свири по-силно.</p>' : '<p>&nbsp;</p>');
+    body = `<h2>🎚 Настройка</h2><p>Изсвири тези клавиши един по един, нормално силно:</p>
+      ${keys}${heardMsg}
+      <div class="btns">${c.tries >= 3 ? '<button data-act="cal-skip">Пропусни тази нота</button>' : ''}<button data-act="cal-cancel">Отказ</button></div>`;
+  } else {
+    const cal = c.cal;
+    const tuneTxt = Math.abs(cal.tune) < 5 ? 'Пианото е добре настроено.' : `Пианото е ${cal.tune > 0 ? 'по-високо' : 'по-ниско'} с ${Math.abs(cal.tune)} цента. Ще го имам предвид.`;
+    const snr = cal.snrDb === null ? '' : cal.snrDb >= 25 ? 'Чувам пианото ясно.' : cal.snrDb >= 15 ? 'Чувам пианото, но стаята е шумна.' : 'Пианото се чува слабо. Приближи устройството.';
+    const snrNum = cal.snrDb === null ? '' : `<p>Пианото е с <b>${cal.snrDb} dB</b> по-силно от шума в стаята.</p>`;
+    body = `<h2>✓ Настройката е запазена</h2><p>${snr}</p>${snrNum}<p>${tuneTxt}</p>
+      <div class="btns"><button class="primary" data-act="cal-done">Готово</button><button data-act="cal-redo">Отначало</button></div>`;
+  }
+  const html = `<div class="card">${body}</div>`;
+  if (html !== calib.html) { calib.html = html; $('#calModal').innerHTML = html; $('#calModal').hidden = false; }
+}
+function endCalibration(saveIt) {
+  const c = calib.c; calib.c = null; $('#calModal').hidden = true;
+  if (saveIt && c && c.cal) store.set('cal', { ...c.cal, noiseSpec: c.cal.noiseSpec ? Array.from(c.cal.noiseSpec, v => +v.toPrecision(4)) : null, sr: mic.det.sr });
+  mic.det.applyCal(loadCal(mic.det.sr));
+  mic.det.probeMode = false;
+  showOverlay('start'); updateDiag(); updateCalButton();
+}
+
+function applySens() { if (mic.det) mic.det.sens = 2 ** (($('#sens').value - 5) / 2.5); }
+function expectedForDetector() {
+  const set = new Set();
+  for (const n of currentTargets()) set.add(n.midi);
+  if (S.mode === 'wait' && S.playing) { // the group after the current one too (players run ahead)
+    const g = nextGroupBeat();
+    const after = S.notes.find(n => n.state === 'pending' && isActive(n) && n.beat > g + 1e-6);
+    if (after) S.notes.filter(n => isActive(n) && Math.abs(n.beat - after.beat) < 1e-6).forEach(n => set.add(n.midi));
+  }
+  return set;
+}
+function processMic() {
+  mic.analyser.getFloatTimeDomainData(mic.buf);
+  const t = nowSec();
+  if (calib.c) {
+    calib.c.feed(mic.buf, t);
+    for (const f of calib.c.flashes) S.flash.set(f.midi, { kind: f.ok ? 'good' : 'bad', until: performance.now() + 700 });
+    calib.c.flashes = [];
+    $('#meterFill').style.width = Math.min(100, Math.sqrt(mic.det.level) * 400) + '%';
+    renderCalib(); return;
+  }
+  if (t - (mic.diagT || 0) > 0.5) { mic.diagT = t; updateDiag(); }
+  const evs = mic.det.process(mic.buf, t);
+  $('#meterFill').style.width = Math.min(100, Math.sqrt(mic.det.level) * 400) + '%';
+  S.accompRecent = S.accompRecent.filter(a => t - a.t < 0.5);
+  const strikes = new Map();
+  for (const ev of evs) {
+    if (S.demo) continue; // it is only hearing our own speakers
+    if (S.accompRecent.some(a => (a.m - ev.midi) % 12 === 0 && ev.t - a.t > -0.05)) continue;
+    mic.heard.push({ midi: ev.midi, t });
+    if (!strikes.has(ev.t)) strikes.set(ev.t, []);
+    strikes.get(ev.t).push(ev.midi);
+  }
+  for (const [t0, midis] of strikes) onStrike(midis, t0);
+  mic.heard = mic.heard.filter(h => t - h.t < 1.2);
+  const txt = mic.heard.length ? [...new Set(mic.heard.map(h => midiName(h.midi, true)))].join(' + ') : '—';
+  if ($('#heard').textContent !== txt) $('#heard').textContent = txt;
+}
+
+/* ============================================================
+   Drawing: grand staff
+   ============================================================ */
+const cv = $('#staff'), g = cv.getContext('2d');
+const kb = $('#kb'), gk = kb.getContext('2d');
+const L = 12, H = 6, T_TOP = 64, T_BOT = T_TOP + 4 * L, B_TOP = T_BOT + 5 * L, B_BOT = B_TOP + 4 * L;
+const INK = { paper: '#fbf8f1', ink: '#1d1f2b', line: '#77757f', next: '#2f6bff', hit: '#17a34a', miss: '#dc3545', off: '#c4beb1', played: '#5a6b8c' };
+let W = 800, CH = 290, PX = 200, PPB = 90, PANEL = 110;
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  W = cv.clientWidth; CH = cv.clientHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(CH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  kb.width = Math.round(kb.clientWidth * dpr); kb.height = Math.round(kb.clientHeight * dpr); gk.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const ks = S.song && S.song.key ? S.song.key.length : 0;
+  PANEL = 76 + ks * 11 + (ks ? 6 : 0) + 30;
+  PX = PANEL + (W < 700 ? 40 : 80);
+  PPB = (W < 700 ? 62 : 88) * (S.song && S.song.zoom || 1);
+}
+const yOf = (diat, staff) => staff === 'T' ? T_BOT - (diat - 30) * H : B_TOP - (diat - 26) * H;
+const staffOf = n => n.hand === 'L' ? 'B' : 'T';
+const xOf = beat => PX + (beat - S.beat) * PPB;
+
+function ledgerYs(diat, staff) {
+  const out = [];
+  if (staff === 'T') { for (let l = 28; l >= diat; l -= 2) out.push(yOf(l, 'T')); for (let l = 40; l <= diat; l += 2) out.push(yOf(l, 'T')); }
+  else { for (let l = 16; l >= diat; l -= 2) out.push(yOf(l, 'B')); for (let l = 28; l <= diat; l += 2) out.push(yOf(l, 'B')); }
+  return out;
+}
+function accidentalFor(n) {
+  const k = (S.song.key || []).find(x => x[0] === n.letter);
+  const keyAcc = k ? (k[1] === '#' ? 1 : -1) : 0;
+  if (n.acc === keyAcc) return '';
+  return n.acc > 0 ? '♯' : n.acc < 0 ? '♭' : '♮';
+}
+function drawHead(x, y, hollow, color) {
+  g.fillStyle = color;
+  g.beginPath(); g.ellipse(x, y, 7.2, 5.2, -0.35, 0, Math.PI * 2); g.fill();
+  if (hollow) { g.fillStyle = INK.paper; g.beginPath(); g.ellipse(x, y, 4.6, 2.3, -0.6, 0, Math.PI * 2); g.fill(); }
+}
+function drawNote(n, x, color) {
+  const staff = staffOf(n), y = yOf(n.diat, staff);
+  g.strokeStyle = color === INK.off ? INK.off : INK.ink; g.lineWidth = 1.3;
+  for (const ly of ledgerYs(n.diat, staff)) { g.beginPath(); g.moveTo(x - 11, ly); g.lineTo(x + 11, ly); g.stroke(); }
+  const acc = accidentalFor(n);
+  if (acc) { g.fillStyle = color; g.font = '18px serif'; g.textAlign = 'center'; g.fillText(acc, x - 17, y + 6); }
+  const dotted = [0.75, 1.5, 3].includes(n.dur);
+  const base = dotted ? n.dur / 1.5 : n.dur;
+  drawHead(x, y, base >= 2, color);
+  if (base < 4) {
+    const up = staff === 'T' ? n.diat < 34 : n.diat < 22;
+    const sx = up ? x + 6.4 : x - 6.4, sy = up ? y - 1 : y + 1, ey = up ? y - 38 : y + 38;
+    g.strokeStyle = color; g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx, ey); g.stroke();
+    const flags = base <= 0.25 ? 2 : base <= 0.5 ? 1 : 0;
+    g.lineWidth = 2.2;
+    for (let f = 0; f < flags; f++) {
+      const fy = up ? ey + f * 8 : ey - f * 8, d = up ? 1 : -1;
+      g.beginPath(); g.moveTo(sx, fy); g.quadraticCurveTo(sx + 9, fy + d * 8, sx + 8, fy + d * 18); g.stroke();
+    }
+  }
+  if (dotted) {
+    const onLine = staff === 'T' ? (n.diat - 30) % 2 === 0 : (n.diat - 26) % 2 === 0;
+    g.fillStyle = color; g.beginPath(); g.arc(x + 12, onLine ? y - 3 : y, 2, 0, Math.PI * 2); g.fill();
+  }
+  if ($('#optNames').checked) {
+    g.fillStyle = color; g.font = '600 12px -apple-system,system-ui,sans-serif'; g.textAlign = 'center';
+    g.fillText(noteName(n), x, staff === 'T' ? 18 : CH - 8);
+  }
+}
+function staffLines(x0, x1) {
+  g.strokeStyle = INK.line; g.lineWidth = 1;
+  for (const top of [T_TOP, B_TOP]) for (let i = 0; i < 5; i++) {
+    const y = top + i * L + 0.5; g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke();
+  }
+}
+function drawStaff() {
+  const now = performance.now(), song = S.song;
+  g.fillStyle = INK.paper; g.fillRect(0, 0, W, CH);
+  if (!song) return;
+
+  // hit window (В темп) / waiting glow (Изчаква ме)
+  if (S.mode === 'realtime' && !S.demo) {
+    const w = HIT_WIN * bps() * PPB;
+    g.fillStyle = 'rgba(47,107,255,.08)'; g.fillRect(PX - w, T_TOP - 30, 2 * w, B_BOT - T_TOP + 60);
+  }
+  staffLines(0, W);
+
+  // bar lines
+  const pk = song.pickup || 0;
+  g.strokeStyle = INK.line; g.lineWidth = 1;
+  for (let k = pk > 0 ? 0 : 1; ; k++) {
+    const b = pk + k * song.bpb;
+    if (b > S.endBeat + 1e-6) break;
+    const x = xOf(b) - PPB * 0.35;
+    if (x > W + 5) break;
+    if (x < PANEL - 20) continue;
+    const final = Math.abs(b - S.endBeat) < 1e-6;
+    g.lineWidth = 1; g.beginPath(); g.moveTo(x, T_TOP); g.lineTo(x, B_BOT); g.stroke();
+    if (final) { g.lineWidth = 4; g.beginPath(); g.moveTo(x + 5, T_TOP); g.lineTo(x + 5, B_BOT); g.stroke(); }
+  }
+
+  // playhead
+  const pulse = S.waiting ? 0.55 + 0.45 * Math.sin(now / 160) : 0.9;
+  g.strokeStyle = `rgba(47,107,255,${pulse})`; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(PX, T_TOP - 26); g.lineTo(PX, B_BOT + 26); g.stroke();
+
+  // notes
+  const targets = new Set(currentTargets());
+  for (const n of S.notes) {
+    const x = xOf(n.beat);
+    if (x < PANEL - 30 || x > W + 30) continue;
+    let color = INK.ink;
+    if (n.state === 'hit') color = INK.hit;
+    else if (n.state === 'miss') color = INK.miss;
+    else if (n.state === 'played') color = INK.played;
+    else if (!isActive(n) && !S.demo) color = INK.off;
+    else if (targets.has(n)) color = INK.next;
+    drawNote(n, x, color);
+  }
+
+  // wrong-note ghosts at the playhead
+  S.ghosts = S.ghosts.filter(gh => now - gh.t < 600);
+  for (const gh of S.ghosts) {
+    const info = midiInfo(gh.midi), staff = gh.midi >= 60 ? 'T' : 'B';
+    g.globalAlpha = 1 - (now - gh.t) / 600;
+    drawHead(PX, yOf(info.diat, staff), false, INK.miss);
+    g.globalAlpha = 1;
+  }
+  // floating feedback between the staves
+  S.feedback = S.feedback.filter(f => now - f.t < 800);
+  g.textAlign = 'right'; g.font = '700 15px -apple-system,system-ui,sans-serif';
+  for (const f of S.feedback) {
+    const a = (now - f.t) / 800;
+    g.globalAlpha = 1 - a; g.fillStyle = f.color;
+    g.fillText(f.text, PX - 10, (T_BOT + B_TOP) / 2 + 5 - a * 14);
+  }
+  g.globalAlpha = 1;
+
+  // left panel: clefs, key and time signature (notes fade under it)
+  const grad = g.createLinearGradient(PANEL, 0, PANEL + 30, 0);
+  grad.addColorStop(0, INK.paper); grad.addColorStop(1, 'rgba(251,248,241,0)');
+  g.fillStyle = INK.paper; g.fillRect(0, 0, PANEL, CH);
+  g.fillStyle = grad; g.fillRect(PANEL, 0, 30, CH);
+  staffLines(8, PANEL + 30);
+  g.strokeStyle = INK.ink; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(8, T_TOP); g.lineTo(8, B_BOT + 1); g.stroke();
+  g.fillStyle = INK.ink; g.textAlign = 'left';
+  g.font = '62px "Apple Symbols","Noto Music","Segoe UI Symbol",serif';
+  g.fillText('𝄞', 14, T_BOT + 11);
+  g.font = '42px "Apple Symbols","Noto Music","Segoe UI Symbol",serif';
+  g.fillText('𝄢', 16, B_TOP + 31);
+  const key = song.key || [];
+  g.font = '20px serif';
+  // standard placement, in the order the key signature adds them
+  const KS = { '#': [[38, 35, 39, 36, 33, 37, 34], [24, 21, 25, 22, 19, 23, 20]], b: [[34, 37, 33, 36, 32, 35, 31], [20, 23, 19, 22, 18, 21, 17]] };
+  key.forEach((k, i) => {
+    const [pt, pb] = KS[k[1]], x = 62 + i * 11, sym = k[1] === '#' ? '♯' : '♭';
+    g.fillText(sym, x, yOf(pt[i], 'T') + 7); g.fillText(sym, x, yOf(pb[i], 'B') + 7);
+  });
+  const [tsTop, tsBot] = (song.ts || `${song.bpb}/4`).split('/');
+  const tx = 68 + key.length * 11 + (key.length ? 6 : 0);
+  g.font = '700 25px Georgia,serif'; g.textAlign = 'center';
+  for (const top of [T_TOP, B_TOP]) { g.fillText(tsTop, tx, top + 2 * L - 2); g.fillText(tsBot, tx, top + 4 * L - 2); }
+}
+
+/* ============================================================
+   Drawing: keyboard
+   ============================================================ */
+const IS_BLACK = [0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0];
+function kbLayout() {
+  const w = kb.clientWidth, h = kb.clientHeight;
+  const whites = []; for (let m = S.kbLo; m <= S.kbHi; m++) if (!IS_BLACK[m % 12]) whites.push(m);
+  const ww = w / whites.length, bw = ww * 0.62, bh = h * 0.62;
+  const keys = [];
+  whites.forEach((m, i) => keys.push({ m, x: i * ww, w: ww, h, black: false }));
+  for (let m = S.kbLo; m <= S.kbHi; m++) if (IS_BLACK[m % 12]) {
+    const i = whites.indexOf(m - 1); if (i >= 0) keys.push({ m, x: (i + 1) * ww - bw / 2, w: bw, h: bh, black: true });
+  }
+  return keys;
+}
+function drawKeyboard() {
+  const w = kb.clientWidth, h = kb.clientHeight, now = performance.now();
+  gk.fillStyle = '#0b0e1a'; gk.fillRect(0, 0, w, h);
+  const targets = new Set(currentTargets().map(n => n.midi));
+  if (calib.c && calib.c.phase === 'notes') targets.add(calib.c.target);
+  const colorFor = (m, black) => {
+    const f = S.flash.get(m);
+    if (f && f.until > now) return f.kind === 'good' ? '#34d17c' : f.kind === 'bad' ? '#ff5d6c' : '#9fb4ff';
+    if (targets.has(m)) return black ? '#3a64e0' : '#8fb0ff';
+    return black ? '#15182a' : '#f7f7fb';
+  };
+  const keys = kbLayout(), heardKeys = [];
+  for (const k of keys) {
+    gk.fillStyle = colorFor(k.m, k.black);
+    if (k.black) { gk.fillRect(k.x, 0, k.w, k.h); }
+    else { gk.fillRect(k.x + 1, 0, k.w - 2, k.h - 1); }
+    const f = S.flash.get(k.m);
+    if (f && f.until > now) heardKeys.push(k);
+    if (!k.black) {
+      gk.textAlign = 'center'; gk.font = '600 11px -apple-system,system-ui,sans-serif';
+      if (k.m % 12 === 0) { gk.fillStyle = '#7a809e'; gk.fillText('До' + (k.m / 12 - 1), k.x + k.w / 2, h - 8); }
+    }
+  }
+  // name every key that was just heard, on a small tag in the lower part of the keyboard
+  gk.font = '700 12px -apple-system,system-ui,sans-serif'; gk.textAlign = 'center';
+  for (const k of heardKeys) {
+    const label = midiName(k.m), tw = gk.measureText(label).width + 10, cx = k.x + k.w / 2, y = h - 34;
+    gk.fillStyle = 'rgba(11,14,26,.85)';
+    gk.beginPath(); gk.roundRect(cx - tw / 2, y - 13, tw, 18, 5); gk.fill();
+    gk.fillStyle = '#fff'; gk.fillText(label, cx, y);
+  }
+}
+/* ============================================================
+   UI wiring
+   ============================================================ */
+function setStatus(t) { $('#inStatus').textContent = t; }
+function updateStats() {
+  $('#stHit').textContent = S.stats.hit; $('#stWrong').textContent = S.stats.wrong;
+  $('#stMiss').textContent = S.stats.miss; $('#stStreak').textContent = S.streak;
+  const a = accuracy(); $('#stAcc').textContent = a === null ? '—' : a + '%';
+}
+function updateButtons() {
+  $('#btnPlay').textContent = S.playing && !S.demo ? '⏸ Пауза' : '▶ Старт';
+  $('#btnDemo').textContent = S.demo ? '⏹ Спри' : '👂 Чуй как звучи';
+}
+function syncSegs() {
+  document.querySelectorAll('#hands button').forEach(b => {
+    b.classList.toggle('on', b.dataset.v === S.hands);
+    b.disabled = b.dataset.v !== 'R' && !(S.song && S.song.hasLH);
+  });
+  document.querySelectorAll('#mode button').forEach(b => b.classList.toggle('on', b.dataset.v === S.mode));
+}
+let lastPrompt = '';
+function updatePrompt() {
+  let html = '';
+  if (S.playing && !S.demo) {
+    const t = currentTargets();
+    if (t.length) {
+      const byHand = h => t.filter(n => n.hand === h).map(n => noteName(n)).join(' + ');
+      const r = byHand('R'), l = byHand('L');
+      html = (S.mode === 'wait' ? 'Изсвири: ' : 'Сега: ') + [r && `${r} <span class="dim">(дясна)</span>`, l && `${l} <span class="dim">(лява)</span>`].filter(Boolean).join(' &nbsp; ');
+    }
+  } else if (S.demo) html = '<span class="dim">Слушай как звучи…</span>';
+  if (html !== lastPrompt) { $('#prompt').innerHTML = html; lastPrompt = html; }
+}
+const handsLabel = () => ({ R: 'дясна ръка', L: 'лява ръка', both: 'двете ръце' })[S.hands];
+function showOverlay(kind, data) {
+  const ov = $('#overlay');
+  if (!kind) { ov.hidden = true; return; }
+  ov.hidden = false;
+  const s = S.song;
+  if (kind === 'start') {
+    ov.innerHTML = `<div class="card"><h2>${s.title}</h2><p>${s.composer} · ${'★'.repeat(s.level)}</p>
+      <p>Свириш с <b>${handsLabel()}</b> · ${S.mode === 'wait' ? 'песента те изчаква' : 'песента върви в темп'}</p>
+      <div class="btns"><button class="primary" data-act="play">▶ Старт</button><button data-act="demo">👂 Чуй първо</button><button data-act="lib">📚 Друга песен</button></div></div>`;
+  } else if (kind === 'pause') {
+    ov.innerHTML = `<div class="card"><h2>Пауза</h2><div class="btns"><button class="primary" data-act="play">▶ Продължи</button><button data-act="restart">↺ Отначало</button></div></div>`;
+  } else if (kind === 'results') {
+    const { acc, isBest } = data, st = S.stats;
+    const stars = acc >= 95 ? 3 : acc >= 80 ? 2 : acc >= 50 ? 1 : 0;
+    const avg = st.offsets.length ? Math.round(1000 * st.offsets.reduce((a, b) => a + Math.abs(b), 0) / st.offsets.length) : null;
+    const msg = stars === 3 ? 'Браво! Отлично изсвирено!' : stars === 2 ? 'Много добре!' : stars === 1 ? 'Добро начало — още веднъж?' : 'Опитай пак по-бавно 🙂';
+    ov.innerHTML = `<div class="card"><h2>${msg}</h2>
+      <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+      <div class="big">${acc === null ? '—' : acc + '%'}</div>
+      <p>Точни ${st.hit} · Грешни ${st.wrong}${S.mode === 'realtime' ? ` · Пропуснати ${st.miss}` : ''}${avg !== null ? ` · средно отклонение ${avg} ms` : ''}</p>
+      ${isBest ? '<p style="color:var(--good);font-weight:600">Нов личен рекорд!</p>' : ''}
+      <div class="btns"><button class="primary" data-act="restart">↺ Още веднъж</button><button data-act="next">Следваща песен →</button><button data-act="lib">📚 Песни</button></div></div>`;
+  }
+}
+$('#calModal').addEventListener('click', e => {
+  const act = e.target.closest('button') && e.target.closest('button').dataset.act;
+  if (act === 'cal-skip') { calib.c.skip(); renderCalib(); }
+  else if (act === 'cal-cancel') endCalibration(false);
+  else if (act === 'cal-redo') startCalibration();
+  else if (act === 'cal-done') endCalibration(true);
+});
+$('#overlay').addEventListener('click', e => {
+  const act = e.target.closest('button') && e.target.closest('button').dataset.act;
+  if (act === 'play') play();
+  else if (act === 'demo') startDemo();
+  else if (act === 'restart') { reset(); play(); }
+  else if (act === 'lib') openLibrary();
+  else if (act === 'next') { const all = allSongs(), i = all.indexOf(S.song); loadSong(all[(i + 1) % all.length].id); }
+});
+function togglePlay() { if (S.demo) { reset(); return; } S.playing ? pause() : play(); }
+$('#btnPlay').onclick = e => { e.currentTarget.blur(); togglePlay(); };
+$('#btnRestart').onclick = e => { e.currentTarget.blur(); reset(); };
+$('#btnDemo').onclick = e => { e.currentTarget.blur(); S.demo ? reset() : startDemo(); };
+$('#btnMic').onclick = e => { e.currentTarget.blur(); toggleMic(); };
+$('#sens').oninput = applySens;
+$('#btnCal').onclick = e => { e.currentTarget.blur(); startCalibration(); };
+updateCalButton();
+$('#tempo').oninput = e => { S.bpm = +e.target.value; $('#tempoVal').textContent = S.bpm; };
+document.querySelectorAll('#hands button').forEach(b => b.onclick = () => { b.blur(); S.hands = b.dataset.v; store.set('hands', S.hands); syncSegs(); reset(); });
+document.querySelectorAll('#mode button').forEach(b => b.onclick = () => { b.blur(); S.mode = b.dataset.v; store.set('mode', S.mode); syncSegs(); reset(); });
+['optNames', 'optMetro', 'optAccomp', 'optOctave'].forEach(id => {
+  const el = $('#' + id); el.checked = store.get(id, el.checked);
+  el.onchange = () => { store.set(id, el.checked); el.blur(); };
+});
+
+function songCard(s, bests, deletable) {
+  const best = Math.max(-1, ...Object.entries(bests).filter(([k]) => k.startsWith(s.id + '|')).map(([, v]) => v));
+  const hands = s.data ? (s.data.some(d => d.hand === 'L') ? 'дясна + лява ръка' : 'само дясна ръка') : s.lh ? 'дясна + лява ръка' : 'само дясна ръка';
+  return `<div class="song${S.song === s ? ' cur' : ''}" data-id="${s.id}" tabindex="0">
+    ${deletable ? `<span class="del" data-del="${s.id}" title="Изтрий">✕</span>` : ''}
+    <b>${esc(s.title)}</b><small>${esc(s.composer)} <span class="stars">${'★'.repeat(s.level)}</span></small>
+    <small>${hands} · ${s.ts || s.bpb + '/4'} · ♩=${s.bpm}</small>
+    ${best >= 0 ? `<span class="best">Най-добро: ${best}%</span>` : ''}</div>`;
+}
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+function openLibrary() {
+  const bests = store.get('bests', {});
+  const section = (title, list, deletable) => list.length
+    ? `<h3>${title}</h3><div class="grid">${list.map(x => songCard(x, bests, deletable)).join('')}</div>` : '';
+  let html = section(SECTIONS.one, SONGS.filter(x => x.cat === 'one'));
+  for (const cat of [...new Set(userSongs.map(u => u.cat))]) html += section('📁 ' + esc(cat), userSongs.filter(u => u.cat === cat), true);
+  html += section(SECTIONS.magic, SONGS.filter(x => x.cat === 'magic'));
+  for (const lvl of [1, 2, 3, 4]) html += section(`<span class="lvl">${'★'.repeat(lvl)}</span> ${LEVELS[lvl]}`, SONGS.filter(x => !x.cat && x.level === lvl));
+  $('#libBody').innerHTML = html;
+  $('#lib').hidden = false;
+}
+$('#libBody').addEventListener('click', e => {
+  const del = e.target.closest('.del');
+  if (del) {
+    const u = userSongs.find(x => x.id === del.dataset.del);
+    if (u && confirm(`Да изтрия ли „${u.title}“?`)) {
+      userSongs = userSongs.filter(x => x !== u); store.set('userSongs', userSongs);
+      if (S.song === u) loadSong(SONGS[0].id);
+      openLibrary();
+    }
+    return;
+  }
+  const b = e.target.closest('.song'); if (!b) return;
+  loadSong(b.dataset.id); $('#lib').hidden = true;
+});
+$('#libBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.classList.contains('song')) e.target.click(); });
+$('#btnImport').onclick = () => $('#impFile').click();
+$('#impFile').onchange = async e => {
+  const cat = $('#impCat').value.trim() || 'Моите песни', msgs = [];
+  for (const f of e.target.files) {
+    try {
+      const song = midiToSong(await f.arrayBuffer(), f.name, cat);
+      userSongs.push(song); msgs.push(`✓ ${song.title} (${song.data.length} ноти)`);
+    } catch (err) { msgs.push(`✗ ${f.name}: ${err.message}`); }
+  }
+  store.set('userSongs', userSongs);
+  e.target.value = '';
+  openLibrary();
+  $('#impMsg').textContent = msgs.join(' · ');
+};
+
+/* ============================================================
+   MIDI file import (Standard MIDI File, format 0/1)
+   ============================================================ */
+function parseMidiFile(buf) {
+  const d = new DataView(buf); let p = 0;
+  const u8 = () => d.getUint8(p++), u16 = () => { const v = d.getUint16(p); p += 2; return v; }, u32 = () => { const v = d.getUint32(p); p += 4; return v; };
+  const str = n => { let r = ''; for (let i = 0; i < n; i++) r += String.fromCharCode(u8()); return r; };
+  const vlq = () => { let v = 0, b; do { b = u8(); v = (v << 7) | (b & 0x7f); } while (b & 0x80); return v; };
+  if (buf.byteLength < 14 || str(4) !== 'MThd') throw new Error('това не е MIDI файл');
+  const hlen = u32(); u16(); const ntr = u16(), div = u16(); p = 8 + hlen;
+  if (div & 0x8000) throw new Error('този вид MIDI (SMPTE време) не се поддържа');
+  const tracks = [], tempos = []; let timeSig = null, keySig = null;
+  for (let t = 0; t < ntr && p + 8 <= buf.byteLength; t++) {
+    const id = str(4), len = u32(), end = Math.min(buf.byteLength, p + len);
+    if (id !== 'MTrk') { p = end; continue; }
+    let tick = 0, status = 0; const on = new Map(), notes = [];
+    while (p < end) {
+      tick += vlq();
+      if (d.getUint8(p) & 0x80) status = u8();
+      if (status === 0xFF) {
+        const type = u8(), l = vlq();
+        if (type === 0x51 && l === 3) tempos.push({ tick, us: (d.getUint8(p) << 16) | (d.getUint8(p + 1) << 8) | d.getUint8(p + 2) });
+        else if (type === 0x58 && !timeSig) timeSig = { num: d.getUint8(p), den: 2 ** d.getUint8(p + 1) };
+        else if (type === 0x59 && keySig === null) keySig = d.getInt8(p);
+        p += l; continue;
+      }
+      if (status === 0xF0 || status === 0xF7) { p += vlq(); continue; }
+      const hi = status & 0xf0, ch = status & 0x0f;
+      if (hi === 0x80 || hi === 0x90) {
+        const n = u8(), v = u8(), k = ch * 128 + n;
+        if (hi === 0x90 && v > 0) { if (!on.has(k)) on.set(k, []); on.get(k).push(tick); }
+        else { const st = on.get(k); if (st && st.length) notes.push({ midi: n, start: st.shift(), end: tick, ch }); }
+      } else if (hi === 0xC0 || hi === 0xD0) p += 1;
+      else p += 2;
+    }
+    p = end;
+    const melodic = notes.filter(n => n.ch !== 9); // channel 10 is drums
+    if (melodic.length) tracks.push(melodic);
+  }
+  return { div, tracks, tempos, timeSig, keySig };
+}
+function midiToSong(buf, fileName, cat) {
+  const mf = parseMidiFile(buf);
+  let groups = mf.tracks;
+  if (groups.length === 1) { // format 0: one track, instruments separated by channel
+    const byCh = new Map(); for (const n of groups[0]) { if (!byCh.has(n.ch)) byCh.set(n.ch, []); byCh.get(n.ch).push(n); }
+    if (byCh.size > 1) groups = [...byCh.values()];
+  }
+  if (!groups.length) throw new Error('във файла няма ноти');
+  const avg = gr => gr.reduce((a, n) => a + n.midi, 0) / gr.length;
+  const maxOverlap = gr => { let mx = 0; for (const n of gr) mx = Math.max(mx, gr.filter(m => m.start <= n.start && m.end > n.start).length); return mx; };
+  const notes = [];
+  if (groups.length === 1) { // one part: a melody stays in the right hand, chords split at middle C
+    const poly = maxOverlap(groups[0]) > 1;
+    for (const n of groups[0]) notes.push({ ...n, hand: poly && n.midi < 60 ? 'L' : 'R' });
+  } else { // several parts (piano staves / instruments): higher ones right hand, lower ones left
+    const avgs = groups.map(avg), hiA = Math.max(...avgs), loA = Math.min(...avgs), cut = (hiA + loA) / 2;
+    groups.forEach((gr, i) => { const h = avgs[i] >= cut ? 'R' : 'L'; for (const n of gr) notes.push({ ...n, hand: h }); });
+  }
+  const DURS = [0.25, 1 / 3, 0.5, 2 / 3, 0.75, 1, 1.5, 2, 3, 4];
+  const qBeat = x => { const s16 = Math.round(x * 4) / 4; return Math.abs(s16 - x) < 0.06 ? s16 : Math.round(x * 3) / 3; };
+  const qDur = x => DURS.reduce((b, v) => Math.abs(v - x) < Math.abs(b - x) ? v : b, DURS[0]);
+  let data = notes.map(n => ({ midi: n.midi, beat: qBeat(n.start / mf.div), dur: qDur((n.end - n.start) / mf.div), hand: n.hand }));
+  for (const x of data) { while (x.midi < 36) x.midi += 12; while (x.midi > 96) x.midi -= 12; } // keep it in the listening range
+  const seen = new Set();
+  data = data.filter(x => { const k = `${x.midi}@${x.beat}`; if (seen.has(k)) return false; seen.add(k); return true; });
+  if (!data.length) throw new Error('във файла няма ноти');
+  const ts = mf.timeSig || { num: 4, den: 4 }, bpb = ts.num * 4 / ts.den;
+  const first = Math.min(...data.map(x => x.beat));
+  const skip = Math.floor(first / bpb + 1e-9) * bpb, into = first - skip;
+  for (const x of data) x.beat = +(x.beat - skip - into).toFixed(6);
+  data.sort((a, b) => a.beat - b.beat || a.midi - b.midi);
+  const tempo = mf.tempos.sort((a, b) => a.tick - b.tick)[0];
+  const bpm = Math.max(30, Math.min(180, tempo ? Math.round(60e6 / tempo.us) : 100));
+  const sf = mf.keySig || 0;
+  const key = sf > 0 ? ['F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#'].slice(0, sf) : sf < 0 ? ['Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb', 'Fb'].slice(0, -sf) : [];
+  const twoHands = data.some(x => x.hand === 'L') && data.some(x => x.hand === 'R');
+  const secs = (Math.max(...data.map(x => x.beat)) + 1) * 60 / bpm;
+  const density = data.length / secs, short = data.some(x => x.dur <= 1 / 3);
+  const level = Math.min(4, 1 + (twoHands ? 1 : 0) + (density > 2.5 ? 1 : 0) + (short ? 1 : 0));
+  return {
+    id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    cat, level, title: fileName.replace(/\.midi?$/i, '').replace(/[_-]+/g, ' ').trim() || 'Без име',
+    composer: 'Внесен файл', bpm, bpb, ts: `${ts.num}/${ts.den}`, pickup: into > 1e-6 ? +(bpb - into).toFixed(6) : 0,
+    key, flats: sf < 0, zoom: short ? 1.6 : 1, data,
+  };
+}
+$('#btnLib').onclick = e => { e.currentTarget.blur(); openLibrary(); };
+$('#btnLibClose').onclick = () => { $('#lib').hidden = true; };
+$('#lib').addEventListener('click', e => { if (e.target.id === 'lib') $('#lib').hidden = true; });
+
+/* ============================================================
+   Main loop
+   ============================================================ */
+function frame(ts) {
+  const dt = S.lastTs ? Math.min(0.1, (ts - S.lastTs) / 1000) : 0;
+  S.lastTs = ts;
+  if (mic.active) processMic();
+  if (S.playing) { update(dt); updatePrompt(); }
+  drawStaff(); drawKeyboard();
+  requestAnimationFrame(frame);
+}
+window.addEventListener('resize', resize);
+
+S.hands = store.get('hands', 'R'); S.mode = store.get('mode', 'wait');
+loadSong(store.get('song', 'hotcross'));
+requestAnimationFrame(frame);
+
+/* ============================================================
+   Self-test: render a song with the real piano samples offline and
+   check what the microphone detector hears. PT.selfTest('ode')
+   ============================================================ */
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+// --- a room for the tests: reverb, a so-so microphone, background noise
+function makeRoom(oc, len, rnd, { reverb = 0.35, room = 0.008, gain = 1 } = {}) {
+  const sr = oc.sampleRate, input = oc.createGain();
+  input.gain.value = gain;
+  const hp = oc.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 110;
+  const lp = oc.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000;
+  input.connect(hp).connect(lp).connect(oc.destination);
+  if (reverb > 0) {
+    const irLen = Math.round(sr * 1.2), ir = oc.createBuffer(1, irLen, sr), d = ir.getChannelData(0);
+    for (let i = 0; i < irLen; i++) d[i] = (rnd() * 2 - 1) * Math.exp(-11.5 * i / sr);
+    const conv = oc.createConvolver(); conv.buffer = ir;
+    const wet = oc.createGain(); wet.gain.value = reverb;
+    input.connect(conv).connect(wet).connect(hp);
+  }
+  if (room > 0) addNoise(oc, len, rnd, 'fan', room);
+  return input;
+}
+function noiseBuf(oc, len, rnd) {
+  const b = oc.createBuffer(1, len, oc.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = rnd() * 2 - 1;
+  return b;
+}
+function addNoise(oc, len, rnd, kind, level) {
+  const sr = oc.sampleRate, dur = len / sr, out = oc.createGain(); out.connect(oc.destination);
+  if (kind === 'fan') {
+    const src = oc.createBufferSource(); src.buffer = noiseBuf(oc, len, rnd);
+    const lp = oc.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700;
+    const g = oc.createGain(); g.gain.value = level;
+    for (let t = 0; t < dur; t += 0.5) g.gain.linearRampToValueAtTime(level * (0.75 + 0.5 * rnd()), t);
+    src.connect(lp).connect(g).connect(out); src.start(0);
+    const hum = oc.createOscillator(), hg = oc.createGain(); hum.frequency.value = 120; hg.gain.value = level * 0.3;
+    hum.connect(hg).connect(out); hum.start(0);
+  } else if (kind === 'typing' || kind === 'claps') {
+    const nb = noiseBuf(oc, Math.round(sr * 0.08), rnd);
+    for (let t = 0.3; t < dur - 0.2; t += kind === 'typing' ? 0.08 + rnd() * 0.25 : 0.4 + rnd() * 0.8) {
+      const src = oc.createBufferSource(); src.buffer = nb;
+      const bp = oc.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = kind === 'typing' ? 2000 + rnd() * 3000 : 1200; bp.Q.value = 0.8;
+      const g = oc.createGain(), a = level * (0.4 + rnd());
+      g.gain.setValueAtTime(a, t); g.gain.exponentialRampToValueAtTime(a * 0.001, t + (kind === 'typing' ? 0.02 : 0.06));
+      src.connect(bp).connect(g).connect(out); src.start(t);
+      if (kind === 'claps' && rnd() < 0.5) { // a knock on the table: low thump
+        const o = oc.createOscillator(), og = oc.createGain(); o.frequency.value = 70 + rnd() * 60;
+        og.gain.setValueAtTime(a * 2, t); og.gain.exponentialRampToValueAtTime(a * 0.002, t + 0.15);
+        o.connect(og).connect(out); o.start(t); o.stop(t + 0.2);
+      }
+    }
+  } else if (kind === 'speech') { // voiced syllables: gliding pitch through two formants
+    for (let t = 0.3; t < dur - 0.4; ) {
+      const syl = 0.12 + rnd() * 0.22, f0 = 95 + rnd() * 140;
+      const o = oc.createOscillator(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f0, t); o.frequency.linearRampToValueAtTime(f0 * (0.85 + rnd() * 0.3), t + syl);
+      const g = oc.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(level * (0.5 + rnd()), t + 0.04);
+      g.gain.setValueAtTime(level * 0.7, t + syl - 0.05); g.gain.linearRampToValueAtTime(0, t + syl);
+      for (const [f, q] of [[400 + rnd() * 500, 5], [1100 + rnd() * 1200, 7]]) {
+        const bp = oc.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = q;
+        o.connect(bp).connect(g);
+      }
+      g.connect(out); o.start(t); o.stop(t + syl + 0.01);
+      t += syl + (rnd() < 0.2 ? 0.3 + rnd() * 0.6 : 0.03 + rnd() * 0.08);
+    }
+  }
+}
+async function renderScene(len, sr, seed, fill, roomOpts) {
+  const oc = new OfflineAudioContext(1, len, sr), rnd = mulberry(seed);
+  const input = makeRoom(oc, len, rnd, roomOpts);
+  fill(oc, input, rnd);
+  return (await oc.startRendering()).getChannelData(0);
+}
+function runDetector(det, x, sr, onEvents) {
+  for (let e = det.N; e <= x.length; e += 800) { const evs = det.process(x.subarray(e - det.N, e), e / sr); if (evs.length) onEvents(evs); }
+}
+// the setup, done offline: 3 s of room noise, then C4, G4, C3 like the user would play them
+async function calibrateOffline({ gain = 0.15, detune = 0, seed = 7, room = 0.008, reverb = 0.35 } = {}) {
+  audio(); await loadPiano();
+  const sr = 48000, len = sr * 10;
+  const x = await renderScene(len, sr, seed, (oc, input) => {
+    CAL_NOTES.forEach((m, i) => playNote(m, 0.9, 1.6 + i * 1.0, 0.6, oc, input, detune));
+  }, { room, reverb, gain });
+  const det = new PolyDetector(sr), cal = new Calibrator(det);
+  const sx = new Float32Array(len); sx.set(x);
+  for (let e = det.N; e <= len && cal.phase !== 'done'; e += 800) cal.feed(sx.subarray(e - det.N, e), e / sr);
+  return { cal: cal.cal || null, phase: cal.phase, heard: cal.hits.map(h => midiName(h.midi, true) + ' ' + (h.cents === null ? '?' : Math.round(h.cents) + 'c')) };
+}
+async function selfTest(id, { hands = 'both', jitter = 0.015, wrong = 0, guided = true, bpm = null, seed = 1, gain = 0.15, detune = 0, room = 0.008, reverb = 0.35, calibrate = true } = {}) {
+  audio(); await loadPiano();
+  const song = allSongs().find(s => s.id === id);
+  const notes = buildNotes(song).filter(n => hands === 'both' || n.hand === hands);
+  const spb = 60 / (bpm || song.bpm), lead = 1.0, sr = 48000;
+  const end = Math.max(...notes.map(n => n.beat + n.dur));
+  const len = Math.ceil((lead + end * spb + 1.5) * sr);
+  const truth = [];
+  const x = await renderScene(len, sr, seed, (oc, input, rnd) => {
+    for (const n of notes) {
+      const t = lead + n.beat * spb + (rnd() - 0.5) * 2 * jitter;
+      let m = n.midi, isWrong = false;
+      if (rnd() < wrong) { m += rnd() < 0.5 ? -2 : 1; isWrong = true; }
+      playNote(m, n.dur * spb, t, 0.35 + 0.45 * rnd(), oc, input, detune);
+      truth.push({ t, m, orig: n.midi, isWrong });
+    }
+  }, { room, reverb, gain });
+  const det = new PolyDetector(sr);
+  if (calibrate) { const c = await calibrateOffline({ gain, detune, room, reverb }); if (c.cal) det.applyCal(c.cal); }
+  if (guided) det.expected = t0 => new Set(truth.filter(tr => Math.abs(tr.t - t0) < 0.12).map(tr => tr.orig));
+  const evs = []; runDetector(det, x, sr, e => evs.push(...e));
+  const used = new Set(); let exact = 0, octave = 0; const missed = [];
+  const find = (tr, ok) => evs.findIndex((ev, i) => !used.has(i) && ev.t - tr.t > -0.03 && ev.t - tr.t < 0.1 && ok(ev));
+  for (const tr of truth) {
+    let i = find(tr, ev => ev.midi === tr.m);
+    if (i >= 0) { used.add(i); exact++; continue; }
+    i = find(tr, ev => (ev.midi - tr.m) % 12 === 0);
+    if (i >= 0) { used.add(i); octave++; continue; }
+    missed.push(tr);
+  }
+  const strikeTimes = [...new Set(evs.map(e => e.t))];
+  const wrongT = strikeTimes.filter(t0 => !evs.some((e, i) => e.t === t0 && used.has(i)));
+  return {
+    notes: truth.length, exact, octave, missed: missed.length, strikes: strikeTimes.length, wrongStrikes: wrongT.length,
+    tune: det.cal ? det.cal.tune : null,
+    missList: missed.slice(0, 8).map(m => midiName(m.m, true) + '@' + m.t.toFixed(2)),
+    wrongList: wrongT.slice(0, 8).map(t0 => evs.filter(e => e.t === t0).map(e => midiName(e.midi, true)).join('+') + '@' + t0.toFixed(2)),
+  };
+}
+// nobody plays; the game waits for notes; how often does the room "play" them?
+async function noiseTest(kind, { secs = 20, level = 0.05, expected = [60, 64, 67, 48], seed = 3, calibrate = true, room = 0.008 } = {}) {
+  audio(); await loadPiano();
+  const sr = 48000, len = sr * secs;
+  const x = await renderScene(len, sr, seed, (oc, input, rnd) => { if (kind !== 'fan') addNoise(oc, len, rnd, kind, level); }, { room });
+  const det = new PolyDetector(sr);
+  if (calibrate) { const c = await calibrateOffline({ room }); if (c.cal) det.applyCal(c.cal); }
+  const set = new Set(expected); det.expected = () => set;
+  const evs = []; runDetector(det, x, sr, e => evs.push(...e));
+  return { kind, onsets: det.onsets || 0, falseNotes: evs.length, expectedHits: evs.filter(e => set.has(e.midi)).length, list: evs.slice(0, 8).map(e => midiName(e.midi, true) + '@' + e.t.toFixed(2)) };
+}
+window.PT = { S, SONGS, validateSongs, selfTest, noiseTest, calibrateOffline, PolyDetector, Calibrator, calib, renderCalib, onStrike, loadSong, midiToSong, parseMidiFile };
+</script>
+</body>
+</html>
