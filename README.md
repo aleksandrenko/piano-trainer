@@ -2,7 +2,7 @@
 
 Уеб приложение за учене на пиано. Нотите се движат по нотния ред, а приложението слуша през микрофона дали изсвирваш правилната нота навреме. Работи с акустично пиано.
 
-**▶ Отвори:** https://aleksandrenko.github.io/piano-trainer/
+**▶ Отвори:** [aleksandrenko.github.io/piano-trainer](https://aleksandrenko.github.io/piano-trainer/)
 
 ## Какво има
 
